@@ -1,4 +1,5 @@
 ﻿using MiniChess.Model;
+using MiniChess.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,11 +20,13 @@ namespace MiniChess
             while (state.TurnCount < MAXTURNS)
             {
                 Console.WriteLine(state.ToString());
-                string s = Console.ReadLine();
-                state.Move(state.CurrentMoves[int.Parse(s)]);
+                Random r = new Random();
+                int move = r.Next(state.CurrentMoves.Count);
+                state.Move(state.CurrentMoves[move]);
                 if (state.Won != Colors.NONE)
                     break;
             }
+            Console.WriteLine(state.ToString());
             Console.WriteLine(state.Won + " has won");
             
             //Console.WriteLine(state.ToString());

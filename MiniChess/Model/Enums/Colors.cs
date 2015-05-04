@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniChess.Model
+namespace MiniChess.Model.Enums
 {
-    public class TurnException : Exception
+    public enum Colors
     {
-        public TurnException(String s) : base(s) { }
+        WHITE = 87, BLACK = 66, NONE = 0
     }
 }
