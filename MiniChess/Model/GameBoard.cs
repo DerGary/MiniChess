@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace MiniChess
 {
+    public enum Colors{
+        WHITE, BLACK
+    }
     public class GameBoard
     {
         private static int firstdimension = 6, seconddimension = 5;
         private char[,] board = new char[firstdimension,seconddimension];
         public int TurnCount { get; private set; }
+        public Colors Turn { get; private set; }
 
-
-        public GameBoard()
-        {
-            MakeBoard("kqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK");
-        }
-
-        public GameBoard(string s)
+        public GameBoard(string s = "kqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", int turncount = 0, Colors turn = Colors.WHITE)
         {
             MakeBoard(s);
+            TurnCount = turncount;
+            Turn = turn;
         }
 
         private void MakeBoard(string p)
@@ -32,7 +32,7 @@ namespace MiniChess
                 {
                     board[a, b] = p[i];
                     b++;
-                    if (b == 5)
+                    if (b == seconddimension)
                     {
                         b = 0;
                         a++;
@@ -40,11 +40,13 @@ namespace MiniChess
                 }
             }
         }
-        public string ToString()
+        public override string ToString()
         {
-            string s = "";
+            string s = "  abcde\n\n";
+            int row = firstdimension;
             for (int a = 0; a < firstdimension; a++)
             {
+                s += row-- + " ";
                 for (int b = 0; b < seconddimension; b++)
                 {
                     s += board[a, b];
@@ -52,6 +54,21 @@ namespace MiniChess
                 s += "\n";
             }
             return s;
+        }
+
+        public void Move(Move m)
+        {
+            board[firstdimension - m.To.Row, (int)m.To.Column] = board[firstdimension- m.From.Row, (int)m.From.Column];
+            board[firstdimension - m.From.Row, (int)m.From.Column] = '.';
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s">a1-b2</param>
+        public void Move(string s)
+        {
+            Move(new Move((Column)s[0] - 97, int.Parse(s[1].ToString()), (Column)s[3] - 97, int.Parse(s[4].ToString())));
         }
     }
 }

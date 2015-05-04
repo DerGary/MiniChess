@@ -11,8 +11,15 @@ namespace MiniChess
     {
         static void Main(string[] args)
         {
-            Console.WriteLine((new GameBoard()).ToString());
-            Console.ReadKey();
+            var state = new GameBoard();
+
+            Console.WriteLine(state.ToString());
+            //state.Move(new Move(Column.a,1,Column.d,4));
+            string s = Console.ReadLine();
+            state.Move(s);
+            Console.WriteLine(state.ToString());
+            s = Console.ReadLine();
+
         }
     }
 }
