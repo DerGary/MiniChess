@@ -6,8 +6,5 @@ using System.Threading.Tasks;
 
 namespace MiniChess.Model
 {
-    public enum Colors
-    {
-        WHITE = 87, BLACK = 66, NONE = 0
-    }
+    public enum Pieces { King = 'k', Queen = 'q', Bishop = 'b', Knight = 'n', Rook = 'r', Pawn = 'p' }
 }

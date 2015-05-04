@@ -10,16 +10,24 @@ namespace MiniChess
 {
     class Program
     {
+        public const int MAXTURNS = 40;
+        public const int MAXROW = 6;
+        public const int MAXCOLUMN = 5;
         static void Main(string[] args)
         {
-            var state = new GameBoard();
-
-            Console.WriteLine(state.ToString());
-            //state.Move(new Move(Column.a,1,Column.d,4));
-            string s = Console.ReadLine();
-            state.Move(s);
-            Console.WriteLine(state.ToString());
-            s = Console.ReadLine();
+            var state = new GameState();
+            while (state.TurnCount < MAXTURNS)
+            {
+                Console.WriteLine(state.ToString());
+                string s = Console.ReadLine();
+                state.Move(state.CurrentMoves[int.Parse(s)]);
+                if (state.Won != Colors.NONE)
+                    break;
+            }
+            Console.WriteLine(state.Won + " has won");
+            
+            //Console.WriteLine(state.ToString());
+            Console.ReadLine();
 
         }
     }

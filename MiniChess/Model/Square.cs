@@ -8,14 +8,16 @@ namespace MiniChess.Model
 {
     public class Square
     {
-        public Column Column { get; set; }
         public int Row { get; set; }
-        public Square(Column column, int row)
+        public int Column { get; set; }
+        public Square(int row,int column)
         {
-            Column = column;
-            if (row < 1 || row > 6)
-                throw new ArgumentOutOfRangeException("Row must be between 1 and 6");
+            if (row < 0 || row > Program.MAXROW)
+                throw new ArgumentOutOfRangeException("Row must be between 0 and Program.MAXROW");
+            if (column < 0 || column > Program.MAXCOLUMN)
+                throw new ArgumentOutOfRangeException("Column must be between 0 and Program.MAXCOLUMN");
             Row = row;
+            Column = column;
         }
     }
 }
