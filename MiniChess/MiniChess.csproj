@@ -41,9 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Colors.cs" />
     <Compile Include="Model\Column.cs" />
     <Compile Include="Model\GameBoard.cs" />
     <Compile Include="Model\Move.cs" />
+    <Compile Include="Model\TurnException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\Square.cs" />
