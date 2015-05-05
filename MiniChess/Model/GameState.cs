@@ -77,15 +77,21 @@ namespace MiniChess.Model
         /// <param name="m">The move that should be made</param>
         public void Move(Move m)
         {
-            char c = board.Get(m.To.Row, m.To.Column);
+            char c = char.ToLower(board.Get(m.To.Row, m.To.Column));
 
             board.Move(m);
 
-            if (c == 'k' || c == 'K')
+            if (c == 'k')
             {
                 Won = Turn;
                 if (Turn == Colors.BLACK)
                     TurnCount++;
+                Turn = Colors.NONE;
+            }
+            else if(TurnCount+1 == Program.MAXTURNS && Turn == Colors.BLACK)
+            {
+                TurnCount++;
+                Won = Colors.NONE;
                 Turn = Colors.NONE;
             }
             else

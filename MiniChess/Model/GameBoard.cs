@@ -103,7 +103,19 @@ namespace MiniChess.Model
         /// </summary>
         public void Move(Move m)
         {
-            board[m.To.Row, m.To.Column] = board[m.From.Row, m.From.Column];
+            char piece = Get(m.From.Row, m.From.Column);
+            if ((m.To.Row == Program.MAXROW-1 || m.To.Row == 0) && piece == 'p')
+            {
+                board[m.To.Row, m.To.Column] = 'q';
+            }
+            else if ((m.To.Row == Program.MAXROW-1 || m.To.Row == 0) && piece == 'P')
+            {
+                board[m.To.Row, m.To.Column] = 'Q';
+            }
+            else
+            {
+                board[m.To.Row, m.To.Column] = board[m.From.Row, m.From.Column];
+            }
             board[m.From.Row, m.From.Column] = '.';
         }
 
