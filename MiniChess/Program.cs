@@ -44,29 +44,11 @@ namespace MiniChess
             //        Console.ReadKey();
             //    }
             //Console.WriteLine(state.ToString());
-            var state = new GameState();
-            while (state.TurnCount < MAXTURNS)
-            {
-                Console.WriteLine(state.ToString());
-                //if (state.Turn == Colors.BLACK)
-                //{
-                //    string s = Console.ReadLine();
-                //    int move = int.Parse(s);
-                //    state.Move(state.CurrentMoves[move]);
-                //}
-                //else
-                {
-                    Random r = new Random();
-                    int move = r.Next(state.CurrentMoves.Count);
-                    state.Move(state.CurrentMoves[move]);
+            while(true){
 
-                }
-                if (state.Won != Colors.NONE)
-                    break;
-               
+            var gameCenter = new GameCenter(new GameState(), new HumanPlayer(), new RandomPlayer());
+            Console.WriteLine(gameCenter.PlayGame());
             }
-            Console.WriteLine(state.ToString());
-            Console.WriteLine(state.Won + " has won");
             Console.ReadLine();
         }
 
