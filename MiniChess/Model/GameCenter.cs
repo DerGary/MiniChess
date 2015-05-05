@@ -1,6 +1,7 @@
 ﻿using MiniChess.Model.Enums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +21,11 @@ namespace MiniChess.Model
         }
         public Colors PlayGame()
         {
+            //string s = "";
             while (State.Turn != Colors.NONE)
             {
-                Console.WriteLine(State.ToString());
+                //Console.WriteLine(State.ToString());
+                //s+=State.ToStringClean() +"\n";
                 if (State.Turn == Colors.WHITE)
                 {
                     State.Move(WhitePlayer.move(State.CurrentMoves));
@@ -31,7 +34,10 @@ namespace MiniChess.Model
                 {
                     State.Move(BlackPlayer.move(State.CurrentMoves));
                 }
+                //State.ToStringClean();
+                //Console.ReadKey();
             }
+            //File.AppendAllText("C:\\Users\\Stefan\\Documents\\text2.txt", s);
             return State.Won;
         }
     }

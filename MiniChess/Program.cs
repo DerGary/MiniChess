@@ -28,7 +28,7 @@ namespace MiniChess
             //        int move = r.Next(state.CurrentMoves.Count);
             //        state.Move(state.CurrentMoves[move]);
             //        if (state.Won != Colors.NONE)
-            //            break;
+            //            break;$
             //    }
             //    Console.WriteLine(state.ToString());
             //    Console.WriteLine(state.Won + " has won");
@@ -44,11 +44,37 @@ namespace MiniChess
             //        Console.ReadKey();
             //    }
             //Console.WriteLine(state.ToString());
-            while(true){
-
-            var gameCenter = new GameCenter(new GameState(), new HumanPlayer(), new RandomPlayer());
-            Console.WriteLine(gameCenter.PlayGame());
+            //string s = "";
+            for (int j = 0; j < 1; j++)
+            {
+                int white = 0;
+                int black = 0;
+                int draw = 0;
+                DateTime dt = DateTime.Now;
+                
+                for (int i = 0; i < 1000000; i++)
+                {
+                    var gameCenter = new GameCenter(new GameState(), new GreedyPlayer(), new GreedyPlayer());
+                    var won = gameCenter.PlayGame();
+                    //Console.WriteLine(won + " has won");
+                    if (won == Colors.WHITE)
+                    {
+                        white++;
+                    }
+                    else if (won == Colors.BLACK)
+                    {
+                        black++;
+                    }
+                    else
+                    {
+                        draw++;
+                    }
+                }
+                Console.WriteLine(dt - DateTime.Now);
+                Console.WriteLine("White: " + white + " Black: " + black + " Draw: " + draw);
             }
+            
+
             Console.ReadLine();
         }
 

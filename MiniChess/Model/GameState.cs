@@ -28,10 +28,8 @@ namespace MiniChess.Model
         /// <param name="turncount">The current turncount of the game default is 0</param>
         /// <param name="turn">The color whose turn it is</param>
         /// <param name="self">the self color</param>
-        public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", int turncount = 0, Colors turn = Colors.WHITE, Colors self = Colors.WHITE)
+        public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", Colors self = Colors.WHITE)
         {
-            TurnCount = turncount;
-            Turn = turn;
             Self = self;
 
             int indexOfNewLine = s.IndexOf('\n');
@@ -42,7 +40,14 @@ namespace MiniChess.Model
             board = new GameBoard(s.Substring(indexOfNewLine + 1));
             CurrentMoves = board.GetMoveList(Turn);
         }
-
+        public GameState(GameState state)
+        {
+            TurnCount = state.TurnCount;
+            Turn = state.Turn;
+            Self = state.Self;
+            board = new GameBoard(state.board);
+            //CurrentMoves = board.GetMoveList(Turn); Todo do i need this later?
+        }
         
         /// <summary>
         /// Returns a string with the current TurnCount, the color whose turn it currently ist and the current chess board.
@@ -98,13 +103,21 @@ namespace MiniChess.Model
             {
                 if (Turn == Colors.WHITE)
                     Turn = Colors.BLACK;
-                else
+                else if (Turn == Colors.BLACK)
                     Turn = Colors.WHITE;
                 if (Turn == Colors.WHITE)
                     TurnCount++;
                 CurrentMoves = board.GetMoveList(Turn);
+                foreach (Move move in CurrentMoves)
+                {
+                    var newState = new GameState(this);
+                    newState.board.Move(move);
+                    move.Score = newState.board.CurrentScore(Turn);
+
+                }
             }
         }
+
 
         /// <summary>
         /// Can be used to make a human readable move like "a1-b2". Which means from square a1 to square b2
@@ -113,6 +126,14 @@ namespace MiniChess.Model
         public void Move(string s)
         {
             Move(new Move(s.ToLower()));
+        }
+
+        public string ToStringClean()
+        {
+            string s = TurnCount + " " + (char)Turn + " ";// +"\n";
+            s += board.ToStringClean();
+            s += " " + CurrentMoves.Count;
+            return s;
         }
     }
 }

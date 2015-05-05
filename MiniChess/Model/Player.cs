@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MiniChess.Model
 {
+    
     public interface IPlayer
     {
         
@@ -30,11 +31,24 @@ namespace MiniChess.Model
     }
     public class RandomPlayer : IPlayer
     {
+        private static Random random = new Random();
         public Move move(List<Move> possibleMoves)
         {
-            Random r = new Random();
-            int move = r.Next(possibleMoves.Count);
+            //Random r = new Random();
+            int move = random.Next(possibleMoves.Count);
             return possibleMoves[move];
+        }
+    }
+    public class GreedyPlayer : IPlayer
+    {
+        private static Random random = new Random();
+        public Move move(List<Move> possibleMoves)
+        {
+            int max = possibleMoves.Max(x => x.Score);
+            IEnumerable<Move> moves = possibleMoves.Where(x => x.Score == max);
+            //Random r = new Random();
+            int index = random.Next(moves.Count());
+            return moves.ToList()[index];
         }
     }
 

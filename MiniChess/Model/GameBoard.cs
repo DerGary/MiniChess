@@ -20,6 +20,17 @@ namespace MiniChess.Model
             MakeBoard(s);
         }
 
+        public GameBoard(GameBoard gameBoard)
+        {
+            for (int a = 0; a < Program.MAXROW; a++)
+            {
+                for (int b = 0; b < Program.MAXCOLUMN; b++)
+                {
+                    board[a, b] = gameBoard.board[a, b];
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new GameBoard with the given string as pieces on the board.
         /// The pieces are saved in descending order so the Move Search Algorithm works.
@@ -79,6 +90,20 @@ namespace MiniChess.Model
             return s;
         }
 
+        public string ToStringClean()
+        {
+            string s = "";
+            for (int a = Program.MAXROW - 1; a >= 0; a--)
+            {
+                for (int b = Program.MAXCOLUMN - 1; b >= 0; b--)
+                {
+                    s += Get(a, b);
+                }
+                //s += "\n";
+            }
+            return s;
+        }
+
         /// <summary>
         /// Gets the Real Saved Board how it is stored in the char array and observed by the program itself
         /// </summary>
@@ -104,11 +129,11 @@ namespace MiniChess.Model
         public void Move(Move m)
         {
             char piece = Get(m.From.Row, m.From.Column);
-            if ((m.To.Row == Program.MAXROW-1 || m.To.Row == 0) && piece == 'p')
+            if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && piece == 'p')
             {
                 board[m.To.Row, m.To.Column] = 'q';
             }
-            else if ((m.To.Row == Program.MAXROW-1 || m.To.Row == 0) && piece == 'P')
+            else if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && piece == 'P')
             {
                 board[m.To.Row, m.To.Column] = 'Q';
             }
@@ -137,6 +162,31 @@ namespace MiniChess.Model
                     }
                 }
             }
+
+            //foreach (Move m in moves)
+            //{
+            //    char c = char.ToLower(Get(m.To.Row, m.To.Column));
+            //    Pieces p = (Pieces)c;
+            //    switch (p)
+            //    {
+            //        case Pieces.King:
+            //            m.Score = 100000;
+            //            break;
+            //        case Pieces.Queen:
+            //            m.Score = 900;
+            //            break;
+            //        case Pieces.Bishop:
+            //        case Pieces.Knight:
+            //            m.Score = 300;
+            //            break;
+            //        case Pieces.Rook:
+            //            m.Score = 500;
+            //            break;
+            //        case Pieces.Pawn:
+            //            m.Score = 100;
+            //            break;
+            //    }
+            //}
             return moves;
         }
 
@@ -274,8 +324,10 @@ namespace MiniChess.Model
         {
             if (c >= 'A' && c <= 'Z')
                 return Colors.WHITE;
-            else
+            else if (c >= 'a' && c <= 'z')
                 return Colors.BLACK;
+            else
+                return Colors.NONE;
         }
 
         /// <summary>
@@ -286,6 +338,56 @@ namespace MiniChess.Model
             int temp = dx;
             dx = dy;
             dy = temp * -1;
+        }
+
+        public int CurrentScore(Colors Turn)
+        {
+            int scoreWhite = 0;
+            int scoreBlack = 0;
+            for (int i = 0; i < Program.MAXROW; i++)
+            {
+                for (int j = 0; j < Program.MAXCOLUMN; j++)
+                {
+                    char c = Get(i, j);
+                    Pieces piece = (Pieces)char.ToLower(c);
+                    Colors color = ColorOfPice(c);
+                    int temp = 0;
+                    switch (piece)
+                    {
+                        case Pieces.King:
+                            temp = 100000;
+                            break;
+                        case Pieces.Queen:
+                            temp = 900;
+                            break;
+                        case Pieces.Bishop:
+                            temp = 300;
+                            break;
+                        case Pieces.Knight:
+                            temp = 300;
+                            break;
+                        case Pieces.Rook:
+                            temp = 500;
+                            break;
+                        case Pieces.Pawn:
+                            temp = 100;
+                            break;
+                    }
+                    if (color == Colors.WHITE)
+                        scoreWhite += temp;
+                    else if(color == Colors.BLACK)
+                        scoreBlack += temp;
+                }
+            }
+            if (Turn == Colors.WHITE)
+            {
+                return scoreWhite - scoreBlack;
+            }
+            else if (Turn == Colors.BLACK)
+            {
+                return scoreBlack - scoreWhite;
+            }
+            return 0;
         }
     }
 }

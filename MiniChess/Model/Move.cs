@@ -13,6 +13,7 @@ namespace MiniChess.Model
     {
         public Square From { get; private set; }
         public Square To { get; private set; }
+        public int Score { get; set; }
 
         /// <summary>
         /// Initializes a move from a given row and column to a given row and column
