@@ -15,6 +15,7 @@ namespace MiniChess
         public const int MAXTURNS = 40;
         public const int MAXROW = 6;
         public const int MAXCOLUMN = 5;
+        public static Random RANDOM = new Random();
         static void Main(string[] args)
         {
             //int wonWhite = 0;
@@ -52,11 +53,11 @@ namespace MiniChess
                 int draw = 0;
                 DateTime dt = DateTime.Now;
                 
-                for (int i = 0; i < 1000000; i++)
+                for (int i = 0; i < 20; i++)
                 {
-                    var gameCenter = new GameCenter(new GameState(), new GreedyPlayer(), new GreedyPlayer());
+                    var gameCenter = new GameCenter(new GameState(), new LookaheadPlayer(), new GreedyPlayer());
                     var won = gameCenter.PlayGame();
-                    //Console.WriteLine(won + " has won");
+                    Console.WriteLine(won + " has won");
                     if (won == Colors.WHITE)
                     {
                         white++;

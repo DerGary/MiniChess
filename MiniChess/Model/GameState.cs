@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MiniChess.Model
@@ -16,7 +17,17 @@ namespace MiniChess.Model
     {
         private GameBoard board;
         public int TurnCount { get; private set; }
-        public Colors Turn { get; private set; }
+        public Colors PreviousTurn { get; private set; }
+        private Colors _turn;
+        public Colors Turn
+        {
+            get { return _turn; }
+            private set
+            {
+                PreviousTurn = _turn;
+                _turn = value;
+            }
+        }
         public Colors Self { get; private set; }
         public Colors Won { get; private set; }
         public List<Move> CurrentMoves { get; private set; }
@@ -30,6 +41,7 @@ namespace MiniChess.Model
         /// <param name="self">the self color</param>
         public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", Colors self = Colors.WHITE)
         {
+            //s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
             Self = self;
 
             int indexOfNewLine = s.IndexOf('\n');
@@ -48,7 +60,7 @@ namespace MiniChess.Model
             board = new GameBoard(state.board);
             //CurrentMoves = board.GetMoveList(Turn); Todo do i need this later?
         }
-        
+
         /// <summary>
         /// Returns a string with the current TurnCount, the color whose turn it currently ist and the current chess board.
         /// </summary>
@@ -83,7 +95,6 @@ namespace MiniChess.Model
         public void Move(Move m)
         {
             char c = char.ToLower(board.Get(m.To.Row, m.To.Column));
-
             board.Move(m);
 
             if (c == 'k')
@@ -93,7 +104,7 @@ namespace MiniChess.Model
                     TurnCount++;
                 Turn = Colors.NONE;
             }
-            else if(TurnCount+1 == Program.MAXTURNS && Turn == Colors.BLACK)
+            else if (TurnCount + 1 == Program.MAXTURNS && Turn == Colors.BLACK)
             {
                 TurnCount++;
                 Won = Colors.NONE;
@@ -108,16 +119,106 @@ namespace MiniChess.Model
                 if (Turn == Colors.WHITE)
                     TurnCount++;
                 CurrentMoves = board.GetMoveList(Turn);
-                foreach (Move move in CurrentMoves)
-                {
-                    var newState = new GameState(this);
-                    newState.board.Move(move);
-                    move.Score = newState.board.CurrentScore(Turn);
-
-                }
+            }
+        }
+        public void Greedy()
+        {
+            foreach (Move move in CurrentMoves)
+            {
+                var newState = new GameState(this);
+                newState.board.Move(move);
+                move.Score = newState.board.CurrentScore(newState.Turn);
             }
         }
 
+        public int StateScore()
+        {
+            if (Turn == Colors.NONE)
+            {
+                if (PreviousTurn == Colors.WHITE)
+                {
+                    return board.CurrentScore(Colors.BLACK);
+                }
+                else if (PreviousTurn == Colors.BLACK)
+                {
+                    return board.CurrentScore(Colors.WHITE);
+                }
+                else
+                {
+                    throw new Exception("shouldn't happen");
+                }
+            }
+            else
+            {
+                return board.CurrentScore(Turn);
+            }
+        }
+
+        Move m0;
+        public Move NegaMax()
+        {
+            List<Thread> threadList = new List<Thread>();
+            int moveCount = this.CurrentMoves.Count;
+            List<List<Move>> listList = new List<List<Move>>();
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            for (int i = 0; i < this.CurrentMoves.Count; i++)
+            {
+                listList[i % 4].Add(this.CurrentMoves[i]);   
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Thread t = new Thread(threadStart);
+                t.Start(listList[i]);
+                threadList.Add(t);
+            }
+            foreach (Thread t in threadList)
+            {
+                t.Join();
+            }
+            //negamax(5, this, true);
+            int max = CurrentMoves.Max(x => x.Score);
+            var list = CurrentMoves.Where(x => x.Score == max);
+            int index = Program.RANDOM.Next(list.Count());
+            m0 = list.ToList()[index];
+            m0.BestMove = true;
+            return m0;
+        }
+        private int negamax(int depth, GameState state)
+        {
+            if (state.Turn == Colors.NONE || depth == 0)
+            {
+                return state.StateScore();
+            }
+            int v2 = int.MinValue;
+
+            for (int i = 0; i < state.CurrentMoves.Count; i++)
+            {
+                GameState newState = new GameState(state);
+                newState.Move(state.CurrentMoves[i]);
+                int v = -(negamax(depth - 1, newState));
+                state.CurrentMoves[i].Score = v;
+                if (v > v2)
+                {
+                    v2 = v;
+                }
+            }
+            
+            return v2;
+        }
+
+        private void threadStart(object obj)
+        {
+            List<Move> m = (List<Move>)obj;
+            foreach (Move item in m)
+            {
+                GameState newState = new GameState(this);
+                newState.Move(item);
+                item.Score = -negamax(3, newState);
+            }
+        }
 
         /// <summary>
         /// Can be used to make a human readable move like "a1-b2". Which means from square a1 to square b2

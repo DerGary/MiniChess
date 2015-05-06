@@ -11,12 +11,12 @@ namespace MiniChess.Model
     public interface IPlayer
     {
         
-        Move move(List<Move> possibleMoves);
+        Move move(GameState state);
     }
 
     public class HumanPlayer : IPlayer
     {
-        public Move move(List<Move> possibleMoves)
+        public Move move(GameState state)
         {
             int mo = 0;
             do
@@ -25,30 +25,42 @@ namespace MiniChess.Model
                 string s = Console.ReadLine();
                 mo = int.Parse(s);
             }
-            while (mo >= possibleMoves.Count || mo < 0);
-            return possibleMoves[mo];
+            while (mo >= state.CurrentMoves.Count || mo < 0);
+            return state.CurrentMoves[mo];
         }
     }
     public class RandomPlayer : IPlayer
     {
         private static Random random = new Random();
-        public Move move(List<Move> possibleMoves)
+        public Move move(GameState state)
         {
             //Random r = new Random();
-            int move = random.Next(possibleMoves.Count);
-            return possibleMoves[move];
+            //Console.Write(state);
+            int move = random.Next(state.CurrentMoves.Count);
+            return state.CurrentMoves[move];
         }
     }
     public class GreedyPlayer : IPlayer
     {
         private static Random random = new Random();
-        public Move move(List<Move> possibleMoves)
+        public Move move(GameState state)
         {
-            int max = possibleMoves.Max(x => x.Score);
-            IEnumerable<Move> moves = possibleMoves.Where(x => x.Score == max);
+            state.Greedy();
+            //Console.Write(state);
+            //Console.ReadKey();
+            int max = state.CurrentMoves.Max(x => x.Score);
+            IEnumerable<Move> moves = state.CurrentMoves.Where(x => x.Score == max);
             //Random r = new Random();
             int index = random.Next(moves.Count());
             return moves.ToList()[index];
+        }
+    }
+    public class LookaheadPlayer : IPlayer
+    {
+        public Move move(GameState state)
+        {
+            Move m = state.NegaMax();
+            return m;
         }
     }
 

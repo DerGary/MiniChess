@@ -24,19 +24,22 @@ namespace MiniChess.Model
             //string s = "";
             while (State.Turn != Colors.NONE)
             {
-                //Console.WriteLine(State.ToString());
+            //Console.WriteLine(State);
+
                 //s+=State.ToStringClean() +"\n";
                 if (State.Turn == Colors.WHITE)
                 {
-                    State.Move(WhitePlayer.move(State.CurrentMoves));
+                    State.Move(WhitePlayer.move(State));
                 }
                 else if (State.Turn == Colors.BLACK)
                 {
-                    State.Move(BlackPlayer.move(State.CurrentMoves));
+                    State.Move(BlackPlayer.move(State));
                 }
+                //Console.WriteLine(State.ToString());
                 //State.ToStringClean();
                 //Console.ReadKey();
             }
+            //Console.WriteLine(State);
             //File.AppendAllText("C:\\Users\\Stefan\\Documents\\text2.txt", s);
             return State.Won;
         }

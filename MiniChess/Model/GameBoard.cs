@@ -379,15 +379,18 @@ namespace MiniChess.Model
                         scoreBlack += temp;
                 }
             }
-            if (Turn == Colors.WHITE)
-            {
-                return scoreWhite - scoreBlack;
-            }
-            else if (Turn == Colors.BLACK)
+            if (Turn == Colors.BLACK)
             {
                 return scoreBlack - scoreWhite;
             }
-            return 0;
+            else if (Turn == Colors.WHITE)
+            {
+                return scoreWhite - scoreBlack;
+            }
+            else
+            {
+                throw new Exception("shouldn't happen");
+            }
         }
     }
 }
