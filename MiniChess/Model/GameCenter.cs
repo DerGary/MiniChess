@@ -1,4 +1,5 @@
 ﻿using MiniChess.Model.Enums;
+using MiniChess.Model.Players;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,20 +14,16 @@ namespace MiniChess.Model
         private GameState State { get; set; }
         private IPlayer WhitePlayer { get; set; }
         private IPlayer BlackPlayer { get; set; }
-        public GameCenter(GameState state, IPlayer whitePlayer, IPlayer blackPlayer)
+        public GameCenter(IPlayer whitePlayer, IPlayer blackPlayer)
         {
-            State = state;
             WhitePlayer = whitePlayer;
             BlackPlayer = blackPlayer;
         }
-        public Colors PlayGame()
+        public Colors PlayGame(GameState state)
         {
-            //string s = "";
+            State = state;
             while (State.Turn != Colors.NONE)
             {
-            //Console.WriteLine(State);
-
-                //s+=State.ToStringClean() +"\n";
                 if (State.Turn == Colors.WHITE)
                 {
                     State.Move(WhitePlayer.move(State));
@@ -35,13 +32,36 @@ namespace MiniChess.Model
                 {
                     State.Move(BlackPlayer.move(State));
                 }
-                //Console.WriteLine(State.ToString());
-                //State.ToStringClean();
-                //Console.ReadKey();
             }
-            //Console.WriteLine(State);
-            //File.AppendAllText("C:\\Users\\Stefan\\Documents\\text2.txt", s);
             return State.Won;
+        }
+        public void PlayGames(int playCount)
+        {
+            int white = 0;
+            int black = 0;
+            int draw = 0;
+            DateTime total = DateTime.Now;
+            for (int i = 0; i < playCount; i++)
+            {
+                DateTime dt = DateTime.Now;
+                var won = PlayGame(new GameState());
+                Console.WriteLine(won + " has won");
+                if (won == Colors.WHITE)
+                {
+                    white++;
+                }
+                else if (won == Colors.BLACK)
+                {
+                    black++;
+                }
+                else
+                {
+                    draw++;
+                }
+                Console.WriteLine("Playtime: " + (dt - DateTime.Now));
+            }
+            Console.WriteLine("Total Playtime: " + (total - DateTime.Now));
+            Console.WriteLine("White: " + white + " Black: " + black + " Draw: " + draw);
         }
     }
 }

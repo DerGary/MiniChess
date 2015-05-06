@@ -14,7 +14,6 @@ namespace MiniChess.Model
         public Square From { get; private set; }
         public Square To { get; private set; }
         public int Score { get; set; }
-        public bool BestMove { get; set; }
 
         /// <summary>
         /// Initializes a move from a given row and column to a given row and column
@@ -41,7 +40,7 @@ namespace MiniChess.Model
 
         public override string ToString()
         {
-            return (From.Row + 1) +""+ (char)(((Program.MAXCOLUMN - 1) - From.Column) + 'a') + "-" + (To.Row + 1) + (char)(((Program.MAXCOLUMN - 1) - To.Column) + 'a') + " Score: "+ Score +  " BestMove: " + BestMove;
+            return (From.Row + 1) +""+ (char)(((Program.MAXCOLUMN - 1) - From.Column) + 'a') + "-" + (To.Row + 1) + (char)(((Program.MAXCOLUMN - 1) - To.Column) + 'a') + " Score: "+ Score;
         }
     }
 

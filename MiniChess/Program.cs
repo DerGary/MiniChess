@@ -48,31 +48,8 @@ namespace MiniChess
             //string s = "";
             for (int j = 0; j < 1; j++)
             {
-                int white = 0;
-                int black = 0;
-                int draw = 0;
-                DateTime dt = DateTime.Now;
-                
-                for (int i = 0; i < 20; i++)
-                {
-                    var gameCenter = new GameCenter(new GameState(), new LookaheadPlayer(), new GreedyPlayer());
-                    var won = gameCenter.PlayGame();
-                    Console.WriteLine(won + " has won");
-                    if (won == Colors.WHITE)
-                    {
-                        white++;
-                    }
-                    else if (won == Colors.BLACK)
-                    {
-                        black++;
-                    }
-                    else
-                    {
-                        draw++;
-                    }
-                }
-                Console.WriteLine(dt - DateTime.Now);
-                Console.WriteLine("White: " + white + " Black: " + black + " Draw: " + draw);
+                var gameCenter = new GameCenter(new GreedyPlayer(), new LookaheadPlayer(4));
+                gameCenter.PlayGames(20);
             }
             
 

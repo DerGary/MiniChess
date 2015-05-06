@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MiniChess.Model
 {
@@ -30,7 +28,6 @@ namespace MiniChess.Model
         }
         public Colors Self { get; private set; }
         public Colors Won { get; private set; }
-        public List<Move> CurrentMoves { get; private set; }
 
         /// <summary>
         /// Initializes a new GameState that is used to observe the chessboard, save the current state of the board and move the chess pieces.
@@ -50,7 +47,6 @@ namespace MiniChess.Model
             TurnCount = int.Parse(split[0]);
             Turn = (Colors)split[1][0];
             board = new GameBoard(s.Substring(indexOfNewLine + 1));
-            CurrentMoves = board.GetMoveList(Turn);
         }
         public GameState(GameState state)
         {
@@ -58,33 +54,8 @@ namespace MiniChess.Model
             Turn = state.Turn;
             Self = state.Self;
             board = new GameBoard(state.board);
-            //CurrentMoves = board.GetMoveList(Turn); Todo do i need this later?
         }
 
-        /// <summary>
-        /// Returns a string with the current TurnCount, the color whose turn it currently ist and the current chess board.
-        /// </summary>
-        public override string ToString()
-        {
-            string s = TurnCount + " " + (char)Turn + "\n" + "  abcde\n\n";
-            s += board.ToString();
-            s += "\nPossible Moves: \n";
-            for (int i = 0; i < CurrentMoves.Count; i++)
-            {
-                s += i + " " + CurrentMoves[i].ToString() + "\n";
-            }
-            return s;
-        }
-
-        /// <summary>
-        /// Prints how the pieces are saved
-        /// </summary>
-        public string ToStringReal()
-        {
-            string s = TurnCount + " " + (char)Turn + "\n" + "  01234\n\n";
-            s += board.ToStringReal();
-            return s;
-        }
 
         /// <summary>
         /// Moves a chess piece from one square to another. 
@@ -118,19 +89,13 @@ namespace MiniChess.Model
                     Turn = Colors.WHITE;
                 if (Turn == Colors.WHITE)
                     TurnCount++;
-                CurrentMoves = board.GetMoveList(Turn);
-            }
-        }
-        public void Greedy()
-        {
-            foreach (Move move in CurrentMoves)
-            {
-                var newState = new GameState(this);
-                newState.board.Move(move);
-                move.Score = newState.board.CurrentScore(newState.Turn);
+                //CurrentMoves = board.GetMoveList(Turn);
             }
         }
 
+        /// <summary>
+        /// Returns the Score of the current State by adding the value of each piece on the board
+        /// </summary>
         public int StateScore()
         {
             if (Turn == Colors.NONE)
@@ -154,71 +119,10 @@ namespace MiniChess.Model
             }
         }
 
-        Move m0;
-        public Move NegaMax()
-        {
-            List<Thread> threadList = new List<Thread>();
-            int moveCount = this.CurrentMoves.Count;
-            List<List<Move>> listList = new List<List<Move>>();
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
-            for (int i = 0; i < this.CurrentMoves.Count; i++)
-            {
-                listList[i % 4].Add(this.CurrentMoves[i]);   
-            }
-            for (int i = 0; i < 4; i++)
-            {
-                Thread t = new Thread(threadStart);
-                t.Start(listList[i]);
-                threadList.Add(t);
-            }
-            foreach (Thread t in threadList)
-            {
-                t.Join();
-            }
-            //negamax(5, this, true);
-            int max = CurrentMoves.Max(x => x.Score);
-            var list = CurrentMoves.Where(x => x.Score == max);
-            int index = Program.RANDOM.Next(list.Count());
-            m0 = list.ToList()[index];
-            m0.BestMove = true;
-            return m0;
-        }
-        private int negamax(int depth, GameState state)
-        {
-            if (state.Turn == Colors.NONE || depth == 0)
-            {
-                return state.StateScore();
-            }
-            int v2 = int.MinValue;
-
-            for (int i = 0; i < state.CurrentMoves.Count; i++)
-            {
-                GameState newState = new GameState(state);
-                newState.Move(state.CurrentMoves[i]);
-                int v = -(negamax(depth - 1, newState));
-                state.CurrentMoves[i].Score = v;
-                if (v > v2)
-                {
-                    v2 = v;
-                }
-            }
-            
-            return v2;
+        public List<Move> GenerateAllLegalMoves(){
+            return board.GetMoveList(Turn);
         }
 
-        private void threadStart(object obj)
-        {
-            List<Move> m = (List<Move>)obj;
-            foreach (Move item in m)
-            {
-                GameState newState = new GameState(this);
-                newState.Move(item);
-                item.Score = -negamax(3, newState);
-            }
-        }
 
         /// <summary>
         /// Can be used to make a human readable move like "a1-b2". Which means from square a1 to square b2
@@ -229,11 +133,34 @@ namespace MiniChess.Model
             Move(new Move(s.ToLower()));
         }
 
+        /// <summary>
+        /// Returns a string with the current TurnCount, the color whose turn it currently ist and the current chess board.
+        /// </summary>
+        public override string ToString()
+        {
+            string s = TurnCount + " " + (char)Turn + "\n" + "  abcde\n\n";
+            s += board.ToString();
+            return s;
+        }
+
+        /// <summary>
+        /// Retusn a string without \n, row and column numbers or characters 
+        /// </summary>
+        /// <returns></returns>
         public string ToStringClean()
         {
             string s = TurnCount + " " + (char)Turn + " ";// +"\n";
             s += board.ToStringClean();
-            s += " " + CurrentMoves.Count;
+            return s;
+        }
+
+        /// <summary>
+        /// Prints how the pieces are saved
+        /// </summary>
+        public string ToStringReal()
+        {
+            string s = TurnCount + " " + (char)Turn + "\n" + "  01234\n\n";
+            s += board.ToStringReal();
             return s;
         }
     }

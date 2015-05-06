@@ -186,6 +186,10 @@ namespace MiniChess.Model
             //            m.Score = 100;
             //            break;
             //    }
+            //    if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && p == Pieces.Pawn)
+            //    {
+            //        m.Score += 600;
+            //    }
             //}
             return moves;
         }
