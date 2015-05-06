@@ -3,16 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MiniChess.Model.Players
 {
-    public class AlphaBetaPlayer : IPlayer
+    public class AlphaBetaTimedPlayer : IPlayer
     {
         private int _depth;
         private GameState _state;
 
-        public AlphaBetaPlayer(int depth)
+        public AlphaBetaTimedPlayer(int depth)
         {
             _depth = depth;
         }
@@ -52,13 +53,32 @@ namespace MiniChess.Model.Players
         //    int index = Program.RANDOM.Next(list.Count());
         //    return list.ToList()[index];
         //}
-
+        int seconds = 7;
         public Move NegaMax()
         {
-            movesTop = _state.GenerateAllLegalMoves();
-            negamax(_depth, _state, -1000000, 1000000);
-            int max = movesTop.Max(x => x.Score);
-            var list = movesTop.Where(x => x.Score == max);
+            List<Move> movesLastDepth = null;
+            int i = 1;
+            try
+            {
+                DateTime end = DateTime.Now+TimeSpan.FromSeconds(seconds);
+                while (end > DateTime.Now)
+                {
+                    movesTop = _state.GenerateAllLegalMoves();
+                    negamax(i, _state, -10000, 10000, end , 0);
+                    movesLastDepth = movesTop;
+                    //Console.WriteLine(i);
+                    int max2 = movesLastDepth.Max(x => x.Score);
+                    //Console.WriteLine(movesLastDepth.First(x => x.Score == max2));
+                    i++;
+                }
+            }
+            catch (TimeoutException ex)
+            {
+
+            }
+
+            int max = movesLastDepth.Max(x => x.Score);
+            var list = movesLastDepth.Where(x => x.Score == max);
             int index = Program.RANDOM.Next(list.Count());
 
             return list.ToList()[index];
@@ -67,8 +87,12 @@ namespace MiniChess.Model.Players
         Move m0;
         List<Move> movesTop;
 
-        private int negamax(int depth, GameState state, int alpha, int beta)
+        private int negamax(int depth, GameState state, int alpha, int beta, DateTime end, int iteration)
         {
+            if (iteration % 20 == 0 && end < DateTime.Now)
+            {
+                throw new TimeoutException();
+            }
             if (state.Turn == Colors.NONE || depth == 0)
             {
                 return state.StateScore();
@@ -84,7 +108,7 @@ namespace MiniChess.Model.Players
             }
             GameState newState = new GameState(state);
             newState.Move(moves.First());
-            int v2 = -(negamax(depth - 1, newState, -beta, -alpha));
+            int v2 = -(negamax(depth - 1, newState, -beta, -alpha,end,++iteration));
             moves.First().Score = v2;
             if (v2 > beta)
             {
@@ -95,9 +119,9 @@ namespace MiniChess.Model.Players
             {
                 newState = new GameState(state);
                 newState.Move(moves[i]);
-                int v = -(negamax(depth - 1, newState, -beta, -alpha));
+                int v = -(negamax(depth - 1, newState, -beta, -alpha,end,++iteration));
                 moves[i].Score = v;
-                if (v > beta) //Todo: Check why not working with >=
+                if (v > beta)
                 {
                     return v;
                 }

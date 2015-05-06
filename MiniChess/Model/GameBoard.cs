@@ -170,7 +170,7 @@ namespace MiniChess.Model
                 switch (p)
                 {
                     case Pieces.King:
-                        m.Score = 100000;
+                        m.Score = 1000000;
                         break;
                     case Pieces.Queen:
                         m.Score = 900;
@@ -365,7 +365,7 @@ namespace MiniChess.Model
                     switch (piece)
                     {
                         case Pieces.King:
-                            temp = 100000;
+                            temp = 1000000;
                             break;
                         case Pieces.Queen:
                             temp = 900;

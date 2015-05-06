@@ -42,6 +42,9 @@ namespace MiniChess.Model
         {
             return (From.Row + 1) +""+ (char)(((Program.MAXCOLUMN - 1) - From.Column) + 'a') + "-" + (To.Row + 1) + (char)(((Program.MAXCOLUMN - 1) - To.Column) + 'a') + " Score: "+ Score;
         }
+        public string ToStringClean() {
+            return "" + (char)(((Program.MAXCOLUMN - 1) - From.Column) + 'a') + (From.Row + 1) + "-" + (char)(((Program.MAXCOLUMN - 1) - To.Column) + 'a')+(To.Row + 1) ;
+        }
     }
 
 }

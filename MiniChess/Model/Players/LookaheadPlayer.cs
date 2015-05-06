@@ -88,5 +88,32 @@ namespace MiniChess.Model.Players
                 item.Score = -negamax(_depth - 1, newState);
             }
         }
+
+        public List<Move> NegaMaxParallelTest(List<Move> moves, GameState state)
+        {
+            _state = state;
+            List<Thread> threadList = new List<Thread>();
+            int moveCount = moves.Count;
+            List<List<Move>> listList = new List<List<Move>>();
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            for (int i = 0; i < moves.Count; i++)
+            {
+                listList[i % 4].Add(moves[i]);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Thread t = new Thread(threadStart);
+                t.Start(listList[i]);
+                threadList.Add(t);
+            }
+            foreach (Thread t in threadList)
+            {
+                t.Join();
+            }
+            return moves;
+        }
     }
 }

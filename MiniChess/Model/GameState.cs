@@ -13,7 +13,7 @@ namespace MiniChess.Model
     /// </summary>
     public class GameState
     {
-        private GameBoard board;
+        private GameBoard _board;
         public int TurnCount { get; private set; }
         public Colors PreviousTurn { get; private set; }
         private Colors _turn;
@@ -38,7 +38,7 @@ namespace MiniChess.Model
         /// <param name="self">the self color</param>
         public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", Colors self = Colors.WHITE)
         {
-            s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
+            //s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
             Self = self;
 
             int indexOfNewLine = s.IndexOf('\n');
@@ -46,17 +46,22 @@ namespace MiniChess.Model
             string[] split = firstline.Split(' ');
             TurnCount = int.Parse(split[0]);
             Turn = (Colors)split[1][0];
-            board = new GameBoard(s.Substring(indexOfNewLine + 1));
+            _board = new GameBoard(s.Substring(indexOfNewLine + 1));
         }
         public GameState(GameState state)
         {
             TurnCount = state.TurnCount;
             Turn = state.Turn;
             Self = state.Self;
-            board = new GameBoard(state.board);
+            _board = new GameBoard(state._board);
         }
 
-
+        public GameState(int turnCount, Colors turn, string board)
+        {
+            TurnCount = turnCount;
+            Turn = turn;
+            _board = new GameBoard(board);
+        }
         /// <summary>
         /// Moves a chess piece from one square to another. 
         /// It also sets "Won" when the enemy king was captured and increases the TurnCount after a full Turn.
@@ -65,8 +70,8 @@ namespace MiniChess.Model
         /// <param name="m">The move that should be made</param>
         public void Move(Move m)
         {
-            char c = char.ToLower(board.Get(m.To.Row, m.To.Column));
-            board.Move(m);
+            char c = char.ToLower(_board.Get(m.To.Row, m.To.Column));
+            _board.Move(m);
 
             if ((Pieces)c == Pieces.King)
             {
@@ -101,11 +106,11 @@ namespace MiniChess.Model
             {
                 if (PreviousTurn == Colors.WHITE)
                 {
-                    return board.CurrentScore(Colors.BLACK, Won, Won == Colors.NONE);
+                    return _board.CurrentScore(Colors.BLACK, Won, Won == Colors.NONE);
                 }
                 else if (PreviousTurn == Colors.BLACK)
                 {
-                    return board.CurrentScore(Colors.WHITE, Won, Won == Colors.NONE);
+                    return _board.CurrentScore(Colors.WHITE, Won, Won == Colors.NONE);
                 }
                 else
                 {
@@ -114,12 +119,12 @@ namespace MiniChess.Model
             }
             else
             {
-                return board.CurrentScore(Turn,Won, false);
+                return _board.CurrentScore(Turn,Won, false);
             }
         }
 
         public List<Move> GenerateAllLegalMoves(){
-            return board.GetMoveList(Turn);
+            return _board.GetMoveList(Turn);
         }
 
 
@@ -138,7 +143,7 @@ namespace MiniChess.Model
         public override string ToString()
         {
             string s = TurnCount + " " + (char)Turn + "\n" + "  abcde\n\n";
-            s += board.ToString();
+            s += _board.ToString();
             return s;
         }
 
@@ -149,7 +154,7 @@ namespace MiniChess.Model
         public string ToStringClean()
         {
             string s = TurnCount + " " + (char)Turn + " ";// +"\n";
-            s += board.ToStringClean();
+            s += _board.ToStringClean();
             return s;
         }
 
@@ -159,7 +164,7 @@ namespace MiniChess.Model
         public string ToStringReal()
         {
             string s = TurnCount + " " + (char)Turn + "\n" + "  01234\n\n";
-            s += board.ToStringReal();
+            s += _board.ToStringReal();
             return s;
         }
     }
