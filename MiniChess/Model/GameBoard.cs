@@ -163,35 +163,37 @@ namespace MiniChess.Model
                 }
             }
 
-            //foreach (Move m in moves)
-            //{
-            //    char c = char.ToLower(Get(m.To.Row, m.To.Column));
-            //    Pieces p = (Pieces)c;
-            //    switch (p)
-            //    {
-            //        case Pieces.King:
-            //            m.Score = 100000;
-            //            break;
-            //        case Pieces.Queen:
-            //            m.Score = 900;
-            //            break;
-            //        case Pieces.Bishop:
-            //        case Pieces.Knight:
-            //            m.Score = 300;
-            //            break;
-            //        case Pieces.Rook:
-            //            m.Score = 500;
-            //            break;
-            //        case Pieces.Pawn:
-            //            m.Score = 100;
-            //            break;
-            //    }
-            //    if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && p == Pieces.Pawn)
-            //    {
-            //        m.Score += 600;
-            //    }
-            //}
-            return moves;
+            foreach (Move m in moves)
+            {
+                char c = char.ToLower(Get(m.To.Row, m.To.Column));
+                Pieces p = (Pieces)c;
+                switch (p)
+                {
+                    case Pieces.King:
+                        m.Score = 100000;
+                        break;
+                    case Pieces.Queen:
+                        m.Score = 900;
+                        break;
+                    case Pieces.Bishop:
+                    case Pieces.Knight:
+                        m.Score = 300;
+                        break;
+                    case Pieces.Rook:
+                        m.Score = 500;
+                        break;
+                    case Pieces.Pawn:
+                        m.Score = 100;
+                        break;
+                }
+                if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && p == Pieces.Pawn)
+                {
+                    m.Score += 600;
+                }
+            }
+
+            return moves.OrderBy(x => x.Score).ToList();
+            //return moves;
         }
 
 
@@ -344,8 +346,12 @@ namespace MiniChess.Model
             dy = temp * -1;
         }
 
-        public int CurrentScore(Colors Turn)
+        public int CurrentScore(Colors Turn, Colors Won, bool draw)
         {
+            if (draw)
+            {
+                return 0;
+            }
             int scoreWhite = 0;
             int scoreBlack = 0;
             for (int i = 0; i < Program.MAXROW; i++)

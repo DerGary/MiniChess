@@ -1,5 +1,6 @@
 ﻿using MiniChess.Model;
 using MiniChess.Model.Enums;
+using MiniChess.Model.Players;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,8 +49,8 @@ namespace MiniChess
             //string s = "";
             for (int j = 0; j < 1; j++)
             {
-                var gameCenter = new GameCenter(new GreedyPlayer(), new LookaheadPlayer(4));
-                gameCenter.PlayGames(20);
+                var gameCenter = new GameCenter(new AlphaBetaPlayer(3), new AlphaBetaPlayer(2));
+                gameCenter.PlayGames(200);
             }
             
 

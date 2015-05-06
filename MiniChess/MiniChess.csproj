@@ -69,6 +69,7 @@
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\Enums\Pieces.cs" />
     <Compile Include="Model\Exceptions\TurnException.cs" />
+    <Compile Include="Model\Players\AlphaBetaPlayer.cs" />
     <Compile Include="Model\Players\GreedyPlayer.cs" />
     <Compile Include="Model\Players\HumanPlayer.cs" />
     <Compile Include="Model\Players\IPlayer.cs" />

@@ -38,7 +38,7 @@ namespace MiniChess.Model
         /// <param name="self">the self color</param>
         public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", Colors self = Colors.WHITE)
         {
-            //s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
+            s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
             Self = self;
 
             int indexOfNewLine = s.IndexOf('\n');
@@ -68,7 +68,7 @@ namespace MiniChess.Model
             char c = char.ToLower(board.Get(m.To.Row, m.To.Column));
             board.Move(m);
 
-            if (c == 'k')
+            if ((Pieces)c == Pieces.King)
             {
                 Won = Turn;
                 if (Turn == Colors.BLACK)
@@ -85,11 +85,10 @@ namespace MiniChess.Model
             {
                 if (Turn == Colors.WHITE)
                     Turn = Colors.BLACK;
-                else if (Turn == Colors.BLACK)
+                else if (Turn == Colors.BLACK){
                     Turn = Colors.WHITE;
-                if (Turn == Colors.WHITE)
                     TurnCount++;
-                //CurrentMoves = board.GetMoveList(Turn);
+                }
             }
         }
 
@@ -102,11 +101,11 @@ namespace MiniChess.Model
             {
                 if (PreviousTurn == Colors.WHITE)
                 {
-                    return board.CurrentScore(Colors.BLACK);
+                    return board.CurrentScore(Colors.BLACK, Won, Won == Colors.NONE);
                 }
                 else if (PreviousTurn == Colors.BLACK)
                 {
-                    return board.CurrentScore(Colors.WHITE);
+                    return board.CurrentScore(Colors.WHITE, Won, Won == Colors.NONE);
                 }
                 else
                 {
@@ -115,7 +114,7 @@ namespace MiniChess.Model
             }
             else
             {
-                return board.CurrentScore(Turn);
+                return board.CurrentScore(Turn,Won, false);
             }
         }
 
