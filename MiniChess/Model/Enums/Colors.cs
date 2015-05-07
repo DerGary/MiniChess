@@ -8,6 +8,6 @@ namespace MiniChess.Model.Enums
 {
     public enum Colors
     {
-        WHITE = 87, BLACK = 66, NONE = 0
+        WHITE = 87, BLACK = 66, NONE = '?'
     }
 }

@@ -38,7 +38,7 @@ namespace MiniChess.Model
         /// <param name="self">the self color</param>
         public GameState(string s = "0 W\nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK", Colors self = Colors.WHITE)
         {
-            //s = "0 W\nkq..Q.n...ppp..P.NP..P...R.B.K";
+            Won = Colors.NONE;
             Self = self;
 
             int indexOfNewLine = s.IndexOf('\n');
@@ -50,6 +50,7 @@ namespace MiniChess.Model
         }
         public GameState(GameState state)
         {
+            Won = state.Won;
             TurnCount = state.TurnCount;
             Turn = state.Turn;
             Self = state.Self;
@@ -58,10 +59,12 @@ namespace MiniChess.Model
 
         public GameState(int turnCount, Colors turn, string board)
         {
+            Won = Colors.NONE;
             TurnCount = turnCount;
             Turn = turn;
             _board = new GameBoard(board);
         }
+
         /// <summary>
         /// Moves a chess piece from one square to another. 
         /// It also sets "Won" when the enemy king was captured and increases the TurnCount after a full Turn.

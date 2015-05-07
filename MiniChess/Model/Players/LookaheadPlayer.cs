@@ -22,18 +22,18 @@ namespace MiniChess.Model.Players
         {
             _state = state;
             List<Move> moves = state.GenerateAllLegalMoves();
-            Move m = NegaMaxParallel(moves);
+            Move m = StartNegamaxParallel(moves);
             return m;
         }
-        public Move NegaMaxParallel(List<Move> moves)
+
+        public Move StartNegamaxParallel(List<Move> moves)
         {
             List<Thread> threadList = new List<Thread>();
             int moveCount = moves.Count;
-            List<List<Move>> listList = new List<List<Move>>();
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
-            listList.Add(new List<Move>());
+            List<List<Move>> listList = new List<List<Move>>()
+            {
+                new List<Move>(),new List<Move>(),new List<Move>(),new List<Move>()
+            };
             for (int i = 0; i < moves.Count; i++)
             {
                 listList[i % 4].Add(moves[i]);
@@ -53,7 +53,8 @@ namespace MiniChess.Model.Players
             int index = Program.RANDOM.Next(list.Count());
             return list.ToList()[index];
         }
-        private int negamax(int depth, GameState state)
+
+        private int Negamax(int depth, GameState state)
         {
             if (state.Turn == Colors.NONE || depth == 0)
             {
@@ -67,7 +68,7 @@ namespace MiniChess.Model.Players
             {
                 GameState newState = new GameState(state);
                 newState.Move(moves[i]);
-                int v = -(negamax(depth - 1, newState));
+                int v = -(Negamax(depth - 1, newState));
                 moves[i].Score = v;
                 if (v > v2)
                 {
@@ -85,7 +86,7 @@ namespace MiniChess.Model.Players
             {
                 GameState newState = new GameState(_state);
                 newState.Move(item);
-                item.Score = -negamax(_depth - 1, newState);
+                item.Score = -Negamax(_depth - 1, newState);
             }
         }
 

@@ -8,38 +8,35 @@ using System.Threading.Tasks;
 
 namespace MiniChess.Model.Players
 {
-    class LookaheadTimedPlayer : IPlayer
+    public class LookaheadTimedPlayer : IPlayer
     {
-                private int _depth;
         private GameState _state;
+        private double _seconds;
+        private List<Move> _movesTop;
 
-        public LookaheadTimedPlayer(int depth)
+        public LookaheadTimedPlayer(double seconds)
         {
-            _depth = depth;
+            _seconds = seconds;
         }
 
         public Move move(GameState state)
         {
             _state = state;
-            List<Move> moves = state.GenerateAllLegalMoves();
-            //Move m = NegaMaxParallel(moves);
-
-            return NegaMax();
+            return StartNegaMaxIterative();
         }
-        List<Move> movesTop;
-        double seconds = 0.1;
-        public Move NegaMax()
+
+        public Move StartNegaMaxIterative()
         {
             List<Move> movesLastDepth = null;
             int i = 1;
             try
             {
-                DateTime end = DateTime.Now + TimeSpan.FromSeconds(seconds);
+                DateTime end = DateTime.Now + TimeSpan.FromSeconds(_seconds);
                 while (end > DateTime.Now)
                 {
-                    movesTop = _state.GenerateAllLegalMoves();
-                    negamax(i, _state, end,0);
-                    movesLastDepth = movesTop;
+                    _movesTop = _state.GenerateAllLegalMoves();
+                    Negamax(i, _state, end, 0);
+                    movesLastDepth = _movesTop;
                     //Console.WriteLine(i);
                     int max2 = movesLastDepth.Max(x => x.Score);
                     //Console.WriteLine(movesLastDepth.First(x => x.Score == max2));
@@ -57,35 +54,8 @@ namespace MiniChess.Model.Players
 
             return list.ToList()[index];
         }
-        //public Move NegaMaxParallel(List<Move> moves)
-        //{
-        //    List<Thread> threadList = new List<Thread>();
-        //    int moveCount = moves.Count;
-        //    List<List<Move>> listList = new List<List<Move>>();
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    for (int i = 0; i < moves.Count; i++)
-        //    {
-        //        listList[i % 4].Add(moves[i]);
-        //    }
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        Thread t = new Thread(threadStart);
-        //        t.Start(listList[i]);
-        //        threadList.Add(t);
-        //    }
-        //    foreach (Thread t in threadList)
-        //    {
-        //        t.Join();
-        //    }
-        //    int max = moves.Max(x => x.Score);
-        //    var list = moves.Where(x => x.Score == max);
-        //    int index = Program.RANDOM.Next(list.Count());
-        //    return list.ToList()[index];
-        //}
-        private int negamax(int depth, GameState state, DateTime end, int iteration)
+
+        private int Negamax(int depth, GameState state, DateTime end, int iteration)
         {
             if (iteration % 30 == 0 && end < DateTime.Now)
             {
@@ -98,7 +68,7 @@ namespace MiniChess.Model.Players
             List<Move> moves = state.GenerateAllLegalMoves();
             if (iteration == 0)
             {
-                movesTop = moves;
+                _movesTop = moves;
             }
             int v2 = int.MinValue;
 
@@ -107,7 +77,7 @@ namespace MiniChess.Model.Players
             {
                 GameState newState = new GameState(state);
                 newState.Move(moves[i]);
-                int v = -(negamax(depth - 1, newState, end, ++iteration));
+                int v = -(Negamax(depth - 1, newState, end, ++iteration));
                 moves[i].Score = v;
                 if (v > v2)
                 {
@@ -117,45 +87,5 @@ namespace MiniChess.Model.Players
 
             return v2;
         }
-
-        //private void threadStart(object obj)
-        //{
-        //    List<Move> m = (List<Move>)obj;
-        //    foreach (Move item in m)
-        //    {
-        //        GameState newState = new GameState(_state);
-        //        newState.Move(item);
-        //        item.Score = -negamax(_depth - 1, newState);
-        //    }
-        //}
-
-        //public List<Move> NegaMaxParallelTest(List<Move> moves, GameState state)
-        //{
-        //    _state = state;
-        //    List<Thread> threadList = new List<Thread>();
-        //    int moveCount = moves.Count;
-        //    List<List<Move>> listList = new List<List<Move>>();
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    listList.Add(new List<Move>());
-        //    for (int i = 0; i < moves.Count; i++)
-        //    {
-        //        listList[i % listList.Count].Add(moves[i]);
-        //    }
-        //    for (int i = 0; i < listList.Count; i++)
-        //    {
-        //        Thread t = new Thread(threadStart);
-        //        t.Start(listList[i]);
-        //        threadList.Add(t);
-        //    }
-        //    foreach (Thread t in threadList)
-        //    {
-        //        t.Join();
-        //    }
-        //    return moves;
-        //}
     }
 }

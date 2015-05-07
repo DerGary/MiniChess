@@ -9,13 +9,14 @@ namespace MiniChess.Model.Players
     public class GreedyPlayer : IPlayer
     {
         private GameState _state;
+
         public Move move(GameState state)
         {
             _state = state;
             List<Move> moves = state.GenerateAllLegalMoves();
-
             return Greedy(moves);
         }
+
         public Move Greedy(List<Move> moves)
         {
             foreach (Move move in moves)
