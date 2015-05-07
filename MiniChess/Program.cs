@@ -20,14 +20,20 @@ namespace MiniChess
         public static Random RANDOM = new Random();
         static void Main(string[] args)
         {
-            //for (int j = 0; j < 1; j++)
-            //{
-            //    var gameCenter = new GameCenter(new AlphaBetaTimedPlayer(4), new GreedyPlayer());
-            //    gameCenter.PlayGames(200);
-            //}
+            for (int j = 0; j < 1; j++)
+            {
+                var gameCenter = new GameCenter(new AlphaBetaPlayer(2), new GreedyPlayer());
+                gameCenter.PlayGames(200);
+            }
+            Console.ReadKey();
+            for (int j = 0; j < 1; j++)
+            {
+                var gameCenter = new GameCenter(new GreedyPlayer(), new AlphaBetaPlayer(2));
+                gameCenter.PlayGames(200);
+            }
 
             
-            ReadAndTestFile();
+            //ReadAndTestFile();
             Console.WriteLine("fertig");
             Console.ReadLine();
         }
@@ -47,8 +53,8 @@ namespace MiniChess
                 char turn = split[1].First();
                 string board = split[2];
                 var state = new GameState(turnCount, (Colors)turn, board);
-                LookaheadPlayer player = new LookaheadPlayer(3);
-                var listMoves = player.NegaMaxParallelTest(state.GenerateAllLegalMoves(),state);
+                AlphaBetaPlayer player = new AlphaBetaPlayer(3);
+                var listMoves = player.NegaMaxTest(state);
                 int score = (int)double.Parse(split[3]);
                 //if (state.StateScore() != score)
                 //{
@@ -58,18 +64,18 @@ namespace MiniChess
 
                 if (split.Count - 3 != listMoves.Count()*2)
                 {
-                    throw new Exception();
+                    throw new Exception("movecount");
                 }
                 for (int j = 3; j < split.Count; j+=2)
                 {
                     IEnumerable<Move> list = listMoves.Where(x => x.ToStringClean() == split[j+1]);
                     if (list.Count() != 1)
                     {
-                        throw new Exception();
+                        throw new Exception("move fehlt");
                     }
-                    if (list.First().Score != (int)double.Parse(split[j]))
+                    if (list.First().Score != (int)double.Parse(split[j].Split('.')[0]))
                     {
-                        throw new Exception();
+                        throw new Exception("movescore" + list.First().Score + "!=" + (int)double.Parse(split[j]));
                     }
                 }
             }

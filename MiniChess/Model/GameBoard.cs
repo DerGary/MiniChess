@@ -163,36 +163,36 @@ namespace MiniChess.Model
                 }
             }
 
-            foreach (Move m in moves)
-            {
-                char c = char.ToLower(Get(m.To.Row, m.To.Column));
-                Pieces p = (Pieces)c;
-                switch (p)
-                {
-                    case Pieces.King:
-                        m.Score = 1000000;
-                        break;
-                    case Pieces.Queen:
-                        m.Score = 900;
-                        break;
-                    case Pieces.Bishop:
-                    case Pieces.Knight:
-                        m.Score = 300;
-                        break;
-                    case Pieces.Rook:
-                        m.Score = 500;
-                        break;
-                    case Pieces.Pawn:
-                        m.Score = 100;
-                        break;
-                }
-                if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && p == Pieces.Pawn)
-                {
-                    m.Score += 600;
-                }
-            }
+            //foreach (Move m in moves)
+            //{
+            //    char c = char.ToLower(Get(m.To.Row, m.To.Column));
+            //    Pieces p = (Pieces)c;
+            //    switch (p)
+            //    {
+            //        case Pieces.King:
+            //            m.Score = 1000000;
+            //            break;
+            //        case Pieces.Queen:
+            //            m.Score = 900;
+            //            break;
+            //        case Pieces.Bishop:
+            //        case Pieces.Knight:
+            //            m.Score = 300;
+            //            break;
+            //        case Pieces.Rook:
+            //            m.Score = 500;
+            //            break;
+            //        case Pieces.Pawn:
+            //            m.Score = 100;
+            //            break;
+            //    }
+            //    if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && p == Pieces.Pawn)
+            //    {
+            //        m.Score += 600;
+            //    }
+            //}
 
-            return moves.OrderBy(x => x.Score).ToList();
+            return moves;//.OrderBy(x => x.Score).ToList();
             //return moves;
         }
 
@@ -354,6 +354,8 @@ namespace MiniChess.Model
             }
             int scoreWhite = 0;
             int scoreBlack = 0;
+            bool whiteKingAlive = false;
+            bool blackKingAlive = false;
             for (int i = 0; i < Program.MAXROW; i++)
             {
                 for (int j = 0; j < Program.MAXCOLUMN; j++)
@@ -365,7 +367,19 @@ namespace MiniChess.Model
                     switch (piece)
                     {
                         case Pieces.King:
-                            temp = 1000000;
+                            if (color == Colors.WHITE)
+                            {
+                                whiteKingAlive = true;
+                            }
+                            else if (color == Colors.BLACK)
+                            {
+                                blackKingAlive = true;
+                            }
+                            else
+                            {
+                                throw new Exception();
+                            }
+                            temp = 10000;
                             break;
                         case Pieces.Queen:
                             temp = 900;
@@ -387,6 +401,26 @@ namespace MiniChess.Model
                         scoreWhite += temp;
                     else if(color == Colors.BLACK)
                         scoreBlack += temp;
+                }
+            }
+            if (!blackKingAlive)
+            {
+                if (Turn == Colors.BLACK)
+                {
+                    return -10000;
+                }else if(Turn == Colors.WHITE){
+                    return 10000;
+                }
+            }
+            if (!whiteKingAlive)
+            {
+                if (Turn == Colors.WHITE)
+                {
+                    return -10000;
+                }
+                else if (Turn == Colors.BLACK)
+                {
+                    return 10000;
                 }
             }
             if (Turn == Colors.BLACK)

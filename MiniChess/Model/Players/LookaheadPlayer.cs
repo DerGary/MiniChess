@@ -99,11 +99,13 @@ namespace MiniChess.Model.Players
             listList.Add(new List<Move>());
             listList.Add(new List<Move>());
             listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
+            listList.Add(new List<Move>());
             for (int i = 0; i < moves.Count; i++)
             {
-                listList[i % 4].Add(moves[i]);
+                listList[i % listList.Count].Add(moves[i]);
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < listList.Count; i++)
             {
                 Thread t = new Thread(threadStart);
                 t.Start(listList[i]);

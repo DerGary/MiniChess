@@ -61,6 +61,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Connection\Connection.cs" />
+    <Compile Include="Model\Connection\Server.cs" />
     <Compile Include="Model\Enums\Colors.cs" />
     <Compile Include="Model\Enums\Column.cs" />
     <Compile Include="Model\GameBoard.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Model\Players\HumanPlayer.cs" />
     <Compile Include="Model\Players\IPlayer.cs" />
     <Compile Include="Model\Players\LookaheadPlayer.cs" />
+    <Compile Include="Model\Players\LookaheadTimedPlayer.cs" />
     <Compile Include="Model\Players\RandomPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

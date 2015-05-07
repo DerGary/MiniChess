@@ -53,7 +53,7 @@ namespace MiniChess.Model.Players
         //    int index = Program.RANDOM.Next(list.Count());
         //    return list.ToList()[index];
         //}
-        int seconds = 7;
+        double seconds = 0.01;
         public Move NegaMax()
         {
             List<Move> movesLastDepth = null;
@@ -98,7 +98,7 @@ namespace MiniChess.Model.Players
                 return state.StateScore();
             }
             List<Move> moves;
-            if (depth == _depth)
+            if (iteration == 0)
             {
                 moves = movesTop;
             }
@@ -121,9 +121,9 @@ namespace MiniChess.Model.Players
                 newState.Move(moves[i]);
                 int v = -(negamax(depth - 1, newState, -beta, -alpha,end,++iteration));
                 moves[i].Score = v;
-                if (v > beta)
+                if (v >= beta)
                 {
-                    return v;
+                    return beta + 1;
                 }
                 v2 = Math.Max(v2, v);
                 alpha = Math.Max(alpha, v);
