@@ -1,4 +1,6 @@
-﻿using MiniChess.Model.Enums;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using MiniChess.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +11,10 @@ namespace MiniChess.Model
 {
     public class GameBoard
     {
-        private char[,] board = new char[Program.MAXROW, Program.MAXCOLUMN];
+        private char[,] _board = new char[Program.MAXROW, Program.MAXCOLUMN];
         public int WhiteScore { get; private set; }
         public int BlackScore { get; private set; }
+        private char _lastOverride;
 
         /// <summary>
         /// Initializes a new GameBoard with the given string as pieces on the board
@@ -19,11 +22,14 @@ namespace MiniChess.Model
         /// <param name="s">a string to initialize the GameBoard. It should look like this: "nkqbnr\nppppp\n.....\n.....\nPPPPP\nRNBQK"</param>
         public GameBoard(string s)
         {
-            WhiteScore =1002500;
-            BlackScore =1002500;
+            WhiteScore =12500;
+            BlackScore =12500;
             MakeBoard(s);
         }
 
+        /// <summary>
+        /// Copy Constructor
+        /// </summary>
         public GameBoard(GameBoard gameBoard)
         {
             WhiteScore = gameBoard.WhiteScore;
@@ -32,7 +38,7 @@ namespace MiniChess.Model
             {
                 for (int b = 0; b < Program.MAXCOLUMN; b++)
                 {
-                    board[a, b] = gameBoard.board[a, b];
+                    _board[a, b] = gameBoard._board[a, b];
                 }
             }
         }
@@ -52,7 +58,7 @@ namespace MiniChess.Model
             {
                 if (s[i] != '\n' && s[i] != '\r')
                 {
-                    board[a, b] = s[i];
+                    _board[a, b] = s[i];
                     b--;
                     if (b == -1)
                     {
@@ -77,67 +83,17 @@ namespace MiniChess.Model
                 throw new ArgumentOutOfRangeException("row is out of Range. must be between 0 and Program.MAXROW");
             if (column < 0 || column >= Program.MAXCOLUMN)
                 throw new ArgumentOutOfRangeException("column is out of Range. must be between 0 and Program.MAXCOLUMN");
-            return board[row, column];
+            return _board[row, column];
         }
 
-        public override string ToString()
-        {
-            string s = "";
-            int row = Program.MAXROW;
-            for (int a = Program.MAXROW - 1; a >= 0; a--)
-            {
-                s += row-- + " ";
-                for (int b = Program.MAXCOLUMN - 1; b >= 0; b--)
-                {
-                    s += Get(a, b);
-                }
-                s += "\n";
-            }
-            return s;
-        }
-
-        public string ToStringClean()
-        {
-            string s = "";
-            for (int a = Program.MAXROW - 1; a >= 0; a--)
-            {
-                for (int b = Program.MAXCOLUMN - 1; b >= 0; b--)
-                {
-                    s += Get(a, b);
-                }
-                //s += "\n";
-            }
-            return s;
-        }
-
-        /// <summary>
-        /// Gets the Real Saved Board how it is stored in the char array and observed by the program itself
-        /// </summary>
-        public string ToStringReal()
-        {
-            string s = "";
-            int row = 0;
-            for (int a = 0; a < Program.MAXROW; a++)
-            {
-                s += row++ + " ";
-                for (int b = 0; b < Program.MAXCOLUMN; b++)
-                {
-                    s += board[a, b];
-                }
-                s += "\n";
-            }
-            return s;
-        }
-
-        char lastOverride;
         /// <summary>
         /// Moves a chess piece from one location to another and sets the previous position to '.'
         /// </summary>
         public void Move(Move m)
         {
-            lastOverride = board[m.To.Row, m.To.Column];
-            int score = ScoreForPiece(m);
-            Colors color = ColorOfPice(lastOverride);
+            _lastOverride = _board[m.To.Row, m.To.Column];
+            int score = ScoreForMove(m);
+            Colors color = ColorOfPice(_lastOverride);
             if (color == Colors.WHITE)
             {
                 WhiteScore -= score;
@@ -149,37 +105,41 @@ namespace MiniChess.Model
             char piece = Get(m.From.Row, m.From.Column);
             if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && piece == 'p')
             {
-                board[m.To.Row, m.To.Column] = 'q';
+                _board[m.To.Row, m.To.Column] = 'q';
             }
             else if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && piece == 'P')
             {
-                board[m.To.Row, m.To.Column] = 'Q';
+                _board[m.To.Row, m.To.Column] = 'Q';
             }
             else
             {
-                board[m.To.Row, m.To.Column] = board[m.From.Row, m.From.Column];
+                _board[m.To.Row, m.To.Column] = _board[m.From.Row, m.From.Column];
             }
-            board[m.From.Row, m.From.Column] = '.';
+            _board[m.From.Row, m.From.Column] = '.';
         }
 
+
+        /// <summary>
+        /// Will Revert the given move. The Move has to be exactly the same than before. The Method will recover kicked Pieces.
+        /// </summary>
         public void RevertMove(Move m)
         {
             char piece = Get(m.To.Row, m.To.Column);
             if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && piece == 'q')
             {
-                board[m.From.Row, m.From.Column] = 'p';
+                _board[m.From.Row, m.From.Column] = 'p';
             }
             else if ((m.From.Row == Program.MAXROW - 1 || m.From.Row == 0) && piece == 'Q')
             {
-                board[m.From.Row, m.From.Column] = 'P';
+                _board[m.From.Row, m.From.Column] = 'P';
             }
             else
             {
-                board[m.From.Row, m.From.Column] = board[m.To.Row, m.To.Column];
+                _board[m.From.Row, m.From.Column] = _board[m.To.Row, m.To.Column];
             }
-            board[m.To.Row, m.To.Column] = lastOverride;
-            int score = ScoreForPiece(m);
-            Colors color = ColorOfPice(lastOverride);
+            _board[m.To.Row, m.To.Column] = _lastOverride;
+            int score = ScoreForMove(m);
+            Colors color = ColorOfPice(_lastOverride);
             if (color == Colors.WHITE)
             {
                 WhiteScore += score;
@@ -188,6 +148,42 @@ namespace MiniChess.Model
             {
                 BlackScore += score;
             }
+        }
+
+        /// <summary>
+        /// Gets a Score for the Given Move
+        /// </summary>
+        private int ScoreForMove(Move m)
+        {
+            char cTo = Get(m.To.Row, m.To.Column);
+            char cFrom = Get(m.From.Row, m.From.Column);
+            char ch = char.ToLower(cTo);
+            Pieces p = (Pieces)ch;
+            int score = 0;
+            switch (p)
+            {
+                case Pieces.King:
+                    score = 10000;
+                    break;
+                case Pieces.Queen:
+                    score = 900;
+                    break;
+                case Pieces.Bishop:
+                case Pieces.Knight:
+                    score = 300;
+                    break;
+                case Pieces.Rook:
+                    score = 500;
+                    break;
+                case Pieces.Pawn:
+                    score = 100;
+                    break;
+            }
+            if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && (Pieces)char.ToLower(cFrom) == Pieces.Pawn)
+            {
+                score += 800;
+            }
+            return score;
         }
 
         /// <summary>
@@ -211,32 +207,7 @@ namespace MiniChess.Model
 
             foreach (Move m in moves)
             {
-                char c = char.ToLower(Get(m.To.Row, m.To.Column));
-                char cFrom = Get(m.From.Row, m.From.Column);
-                Pieces p = (Pieces)c;
-                switch (p)
-                {
-                    case Pieces.King:
-                        m.Score = 1000000;
-                        break;
-                    case Pieces.Queen:
-                        m.Score = 900;
-                        break;
-                    case Pieces.Bishop:
-                    case Pieces.Knight:
-                        m.Score = 300;
-                        break;
-                    case Pieces.Rook:
-                        m.Score = 500;
-                        break;
-                    case Pieces.Pawn:
-                        m.Score = 100;
-                        break;
-                }
-                if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && (Pieces)char.ToLower(cFrom) == Pieces.Pawn)
-                {
-                    m.Score += 800;
-                }
+                m.Score = ScoreForMove(m);
             }
             moves = moves.OrderByDescending(x => x.Score).ToList();
             foreach (Move m in moves)
@@ -247,39 +218,7 @@ namespace MiniChess.Model
             return moves;//.OrderBy(x => x.Score).ToList();
             //return moves;
         }
-        public int ScoreForPiece(Move m)
-        {
-            char cTo = Get(m.To.Row, m.To.Column);
-            char cFrom = Get(m.From.Row, m.From.Column);
-            Colors color = ColorOfPice(cTo);
-            char ch = char.ToLower(cTo);
-            Pieces p = (Pieces)ch;
-            int score = 0;
-            switch (p)
-            {
-                case Pieces.King:
-                    score = 1000000;
-                    break;
-                case Pieces.Queen:
-                    score = 900;
-                    break;
-                case Pieces.Bishop:
-                case Pieces.Knight:
-                    score = 300;
-                    break;
-                case Pieces.Rook:
-                    score = 500;
-                    break;
-                case Pieces.Pawn:
-                    score = 100;
-                    break;
-            }
-            if ((m.To.Row == Program.MAXROW - 1 || m.To.Row == 0) && (Pieces)char.ToLower(cFrom) == Pieces.Pawn)
-            {
-                score += 800;
-            }
-            return score;
-        }
+        
 
         /// <summary>
         /// Generates a list of moves that are possible for the current board and the given square
@@ -463,7 +402,7 @@ namespace MiniChess.Model
                             {
                                 throw new Exception();
                             }
-                            temp = 1000000;
+                            temp = 10000;
                             break;
                         case Pieces.Queen:
                             temp = 900;
@@ -481,7 +420,7 @@ namespace MiniChess.Model
                     }
                     if (color == Colors.WHITE)
                         scoreWhite += temp;
-                    else if(color == Colors.BLACK)
+                    else if (color == Colors.BLACK)
                         scoreBlack += temp;
                 }
             }
@@ -489,20 +428,22 @@ namespace MiniChess.Model
             {
                 if (Turn == Colors.BLACK)
                 {
-                    return -1000000;
-                }else if(Turn == Colors.WHITE){
-                    return 1000000;
+                    return -10000;
+                }
+                else if (Turn == Colors.WHITE)
+                {
+                    return 10000;
                 }
             }
             if (!whiteKingAlive)
             {
                 if (Turn == Colors.WHITE)
                 {
-                    return -1000000;
+                    return -10000;
                 }
                 else if (Turn == Colors.BLACK)
                 {
-                    return 1000000;
+                    return 10000;
                 }
             }
             if (Turn == Colors.BLACK)
@@ -518,50 +459,100 @@ namespace MiniChess.Model
                 throw new Exception("shouldn't happen");
             }
         }
+
         public int CurrentScoreFast(Colors Turn, Colors Won, bool draw)
         {
             if (draw)
             {
                 return 0;
             }
-            int scoreWhite = 0;
-            int scoreBlack = 0;
             bool whiteKingAlive = WhiteScore >= 10000;
             bool blackKingAlive = BlackScore >= 10000;
             if (!blackKingAlive)
             {
                 if (Turn == Colors.BLACK)
                 {
-                    return -1000000;
+                    return -100000;
                 }
                 else if (Turn == Colors.WHITE)
                 {
-                    return 1000000;
+                    return 100000;
                 }
             }
             if (!whiteKingAlive)
             {
                 if (Turn == Colors.WHITE)
                 {
-                    return -1000000;
+                    return -100000;
                 }
                 else if (Turn == Colors.BLACK)
                 {
-                    return 1000000;
+                    return 100000;
                 }
             }
             if (Turn == Colors.BLACK)
             {
-                return scoreBlack - scoreWhite;
+                return BlackScore - WhiteScore;
             }
             else if (Turn == Colors.WHITE)
             {
-                return scoreWhite - scoreBlack;
+                return WhiteScore - BlackScore;
             }
             else
             {
                 throw new Exception("shouldn't happen");
             }
         }
+
+        #region ToString Methods
+        public override string ToString()
+        {
+            string s = "";
+            int row = Program.MAXROW;
+            for (int a = Program.MAXROW - 1; a >= 0; a--)
+            {
+                s += row-- + " ";
+                for (int b = Program.MAXCOLUMN - 1; b >= 0; b--)
+                {
+                    s += Get(a, b);
+                }
+                s += "\n";
+            }
+            return s;
+        }
+
+        public string ToStringClean()
+        {
+            string s = "";
+            for (int a = Program.MAXROW - 1; a >= 0; a--)
+            {
+                for (int b = Program.MAXCOLUMN - 1; b >= 0; b--)
+                {
+                    s += Get(a, b);
+                }
+                //s += "\n";
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// Gets the Real Saved Board how it is stored in the char array and observed by the program itself
+        /// </summary>
+        public string ToStringReal()
+        {
+            string s = "";
+            int row = 0;
+            for (int a = 0; a < Program.MAXROW; a++)
+            {
+                s += row++ + " ";
+                for (int b = 0; b < Program.MAXCOLUMN; b++)
+                {
+                    s += _board[a, b];
+                }
+                s += "\n";
+            }
+            return s;
+        }
+        #endregion //ToString Methods
     }
 }

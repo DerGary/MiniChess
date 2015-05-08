@@ -1,4 +1,6 @@
-﻿using MiniChess.Model.Connection;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using MiniChess.Model.Connection;
 using MiniChess.Model.Enums;
 using MiniChess.Model.Players;
 using System;
@@ -95,11 +97,15 @@ namespace MiniChess.Model
                 }
                 else
                 {
-                    Move m = server.move(state);
+                    Move m = server.Move(state);
+                    if (m == null)
+                    {
+                        break;
+                    }
                     state.Move(m);
                 }
             }
-            server.GetResult();
+            //server.GetResult();
             Console.WriteLine("Self : " + color + " Gewonnen: " + state.Won);
         }
     }

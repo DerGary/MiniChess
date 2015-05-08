@@ -1,4 +1,6 @@
-﻿using MiniChess.Model.Enums;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using MiniChess.Model.Enums;
 using MiniChess.Model.Players;
 using System;
 using System.Collections.Generic;
@@ -93,7 +95,7 @@ namespace MiniChess.Model.Connection
             Send(p);
         }
 
-        public string WaitForMove()
+        public string WaitForMove(int iteration = 0)
         {
             string str = Read();
             string move = str.Split('\n')[0];
@@ -101,9 +103,13 @@ namespace MiniChess.Model.Connection
             {
                 return move.Split(' ')[1];
             }
+            else if (iteration < 20)
+            {
+                return WaitForMove(++iteration);
+            }
             else
             {
-                return WaitForMove();
+                return null;
             }
         }
 
@@ -121,9 +127,18 @@ namespace MiniChess.Model.Connection
             }
         }
 
-        public Move move(GameState state)
+        public Move Move(GameState state)
         {
-            return new Move(WaitForMove());
+            string s = WaitForMove();
+            if (!string.IsNullOrEmpty(s))
+            {
+                Move m = new Move(s);
+                return m;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using MiniChess.Model;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using MiniChess.Model;
 using MiniChess.Model.Connection;
 using MiniChess.Model.Enums;
 using MiniChess.Model.Players;
@@ -21,13 +23,13 @@ namespace MiniChess
         public static Random RANDOM = new Random();
         static void Main(string[] args)
         {
-            for (int j = 0; j < 1; j++)
-            {
-                var gameCenter = new GameCenter();
-                gameCenter.PlayGames(200, new LookaheadPlayer(3), new GreedyPlayer());
-            }
+            //for (int j = 0; j < 1; j++)
+            //{
+            //    var gameCenter = new GameCenter();
+            //    gameCenter.PlayGames(200, new LookaheadPlayer(3), new GreedyPlayer());
+            //}
 
-            //dostuff();
+            dostuff();
 
             //ReadAndTestFile();
             Console.WriteLine("fertig");
@@ -35,11 +37,12 @@ namespace MiniChess
         }
         public static void dostuff()
         {
-            //Server s = new Server("193.175.31.102", 80);
+            //Server server = new Server("193.175.31.102", 80);
             Server server = new Server("131.252.214.11", 3589);
             GameCenter center = new GameCenter();
             AlphaBetaTimedPlayer player = new AlphaBetaTimedPlayer(7.3);
-            center.PlayGameOnServer(player, server, false,10490);
+            //center.PlayGameOnServer(player, server, false, 161);
+            center.PlayGameOnServer(player, server, true); 
         }
         //public static void ReadAndTestFile()
         //{

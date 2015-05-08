@@ -1,4 +1,6 @@
-﻿using MiniChess.Model.Enums;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using MiniChess.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

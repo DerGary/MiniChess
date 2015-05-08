@@ -1,4 +1,7 @@
-﻿using MiniChess.Model.Enums;
+﻿/* Copyright 2015 by Stefan Gerasch */
+/* Algorithm by Bart Massey */
+
+using MiniChess.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +27,10 @@ namespace MiniChess.Model.Players
             int v2 = int.MinValue;
             for (int i = 0; i < moves.Count; i++)
             {
-                state.Move(moves[i]);
-                int v = -(NegamaxRevert(depth - 1, new GameState(state),alphaBeta, -beta, -alpha, end, iteration == -1 ? -1 : ++iteration));
-                state.RevertMove(moves[i]);
+                GameState newState = new GameState(state);
+                newState.Move(moves[i]);
+                int v = -(NegamaxRevert(depth - 1, newState, alphaBeta, -beta, -alpha, end, iteration == -1 ? -1 : ++iteration));
+                //state.RevertMove(moves[i]);
                 moves[i].Score = v;
                 if (alphaBeta) //alpha beta should be used
                 {

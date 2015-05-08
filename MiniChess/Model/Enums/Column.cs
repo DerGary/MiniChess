@@ -1,4 +1,6 @@
-﻿using System;
+﻿/* Copyright 2015 by Stefan Gerasch */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
