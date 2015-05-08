@@ -59,7 +59,7 @@ namespace MiniChess.Model.Connection
             Console.WriteLine(result);
             return result;
         }
-        public void Login(string username = "Gary", string password = "belinea")
+        public void Login(string username = "Error404NameNotFound", string password = "belinea")
         {
             Send("me " + username + " " + password);
             Read();

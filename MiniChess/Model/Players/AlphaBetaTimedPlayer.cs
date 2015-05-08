@@ -47,7 +47,7 @@ namespace MiniChess.Model.Players
                     {
                         break;
                     }
-                    NegaMax.NegamaxRevert(i, newState,true, -1000000, 1000000, end, 0, temp);
+                    NegaMax.NegamaxRevert(i, newState, true, -1000000, 1000000, end, 0, temp);
                     movesDepth.Add(i, temp);
                 }
             }

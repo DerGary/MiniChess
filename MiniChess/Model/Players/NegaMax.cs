@@ -30,7 +30,7 @@ namespace MiniChess.Model.Players
                 GameState newState = new GameState(state);
                 newState.Move(moves[i]);
                 int v = -(NegamaxRevert(depth - 1, newState, alphaBeta, -beta, -alpha, end, iteration == -1 ? -1 : ++iteration));
-                //state.RevertMove(moves[i]);
+                //state.RevertMove(moves[i]); revert seems buggy somehow
                 moves[i].Score = v;
                 if (alphaBeta) //alpha beta should be used
                 {
