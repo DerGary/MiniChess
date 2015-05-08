@@ -15,17 +15,9 @@ namespace MiniChess.Model
     {
         private GameBoard _board;
         public int TurnCount { get; private set; }
-        public Colors PreviousTurn { get; private set; }
-        private Colors _turn;
-        public Colors Turn
-        {
-            get { return _turn; }
-            private set
-            {
-                PreviousTurn = _turn;
-                _turn = value;
-            }
-        }
+        //public Colors PreviousTurn { get; private set; }
+        //private Colors _turn;
+        public Colors Turn { get; private set; }
         public Colors Self { get; private set; }
         public Colors Won { get; private set; }
 
@@ -44,7 +36,7 @@ namespace MiniChess.Model
             int indexOfNewLine = s.IndexOf('\n');
             string firstline = s.Substring(0, indexOfNewLine);
             string[] split = firstline.Split(' ');
-            TurnCount = int.Parse(split[0]);
+            TurnCount = int.Parse(split[0])*2;
             Turn = (Colors)split[1][0];
             _board = new GameBoard(s.Substring(indexOfNewLine + 1));
         }
@@ -52,6 +44,7 @@ namespace MiniChess.Model
         {
             Won = state.Won;
             TurnCount = state.TurnCount;
+            //PreviousTurn = state.PreviousTurn;
             Turn = state.Turn;
             Self = state.Self;
             _board = new GameBoard(state._board);
@@ -79,13 +72,10 @@ namespace MiniChess.Model
             if ((Pieces)c == Pieces.King)
             {
                 Won = Turn;
-                if (Turn == Colors.BLACK)
-                    TurnCount++;
                 Turn = Colors.NONE;
             }
-            else if (TurnCount + 1 == Program.MAXTURNS && Turn == Colors.BLACK)
+            else if (TurnCount + 1 == Program.MAXTURNS)
             {
-                TurnCount++;
                 Won = Colors.NONE;
                 Turn = Colors.NONE;
             }
@@ -93,11 +83,10 @@ namespace MiniChess.Model
             {
                 if (Turn == Colors.WHITE)
                     Turn = Colors.BLACK;
-                else if (Turn == Colors.BLACK){
+                else if (Turn == Colors.BLACK)
                     Turn = Colors.WHITE;
-                    TurnCount++;
-                }
             }
+            TurnCount++;
         }
 
         /// <summary>
@@ -107,13 +96,13 @@ namespace MiniChess.Model
         {
             if (Turn == Colors.NONE)
             {
-                if (PreviousTurn == Colors.WHITE)
+                if (TurnCount % 2 == 0)
                 {
-                    return _board.CurrentScore(Colors.BLACK, Won, Won == Colors.NONE);
+                    return _board.CurrentScoreFast(Colors.WHITE, Won, Won == Colors.NONE);
                 }
-                else if (PreviousTurn == Colors.BLACK)
+                else if (TurnCount % 2 == 1)
                 {
-                    return _board.CurrentScore(Colors.WHITE, Won, Won == Colors.NONE);
+                    return _board.CurrentScoreFast(Colors.BLACK, Won, Won == Colors.NONE);
                 }
                 else
                 {
@@ -122,11 +111,12 @@ namespace MiniChess.Model
             }
             else
             {
-                return _board.CurrentScore(Turn,Won, false);
+                return _board.CurrentScoreFast(Turn, Won, false);
             }
         }
 
-        public List<Move> GenerateAllLegalMoves(){
+        public List<Move> GenerateAllLegalMoves()
+        {
             return _board.GetMoveList(Turn);
         }
 
@@ -169,6 +159,32 @@ namespace MiniChess.Model
             string s = TurnCount + " " + (char)Turn + "\n" + "  01234\n\n";
             s += _board.ToStringReal();
             return s;
+        }
+
+
+        public void RevertMove(Move m)
+        {
+            _board.RevertMove(m);
+            char c = char.ToLower(_board.Get(m.To.Row, m.To.Column));
+            TurnCount--;
+
+            if ((Pieces)c == Pieces.King)
+            {
+                Turn = Won;
+                Won = Colors.NONE;
+            }
+            else if (TurnCount + 1 == Program.MAXTURNS)
+            {
+                Won = Colors.NONE;
+                Turn = Colors.BLACK;
+            }
+            else
+            {
+                if (Turn == Colors.WHITE)
+                    Turn = Colors.BLACK;
+                else if (Turn == Colors.BLACK)
+                    Turn = Colors.WHITE;
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace MiniChess.Model
         {
             From = new Square(fromRow, fromColumn);
             To = new Square(toRow, toColumn);
-            Score = int.MinValue;
+            Score = 0;
         }
 
         /// <summary>

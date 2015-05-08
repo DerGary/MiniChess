@@ -21,7 +21,7 @@ namespace MiniChess.Model.Players
         public Move move(GameState state)
         {
             _state = state;
-            Move m = StartNegamaxIterativeParallel();
+            Move m = StartNegamaxIterative();
             return m;
         }
 
@@ -32,10 +32,15 @@ namespace MiniChess.Model.Players
             try
             {
                 DateTime end = DateTime.Now+TimeSpan.FromSeconds(_seconds);
+                GameState newState = new GameState(_state);
                 while (end > DateTime.Now)
                 {
-                    List<Move> temp = _state.GenerateAllLegalMoves();
-                    Negamax(i, _state, -10000, 10000, end, 0, temp);
+                    List<Move> temp = newState.GenerateAllLegalMoves();
+                    if (temp.Count == 0)
+                    {
+                        break;
+                    }
+                    NegaMax.NegamaxRevert(i, newState,true, -1000000, 1000000, end, 0, temp);
                     movesDepth.Add(i, temp);
                     i++;
                 }
@@ -53,136 +58,6 @@ namespace MiniChess.Model.Players
             //int index = Program.RANDOM.Next(list.Count());
             //return list.ToList()[index];
             return move;
-        }
-
-        public Move StartNegamaxIterativeParallel()
-        {
-            Dictionary<int, List<Move>> movesDepth = new Dictionary<int, List<Move>>();
-            int i1 = 0;
-            int i2 = 1;
-            //int i3 = 2;
-            //int i4 = 3;
-                DateTime end = DateTime.Now + TimeSpan.FromSeconds(_seconds);
-                Thread t1 = new Thread(new ThreadStart(() => {
-                    try
-                    {
-                        while (end > DateTime.Now)
-                        {
-                            List<Move> temp = _state.GenerateAllLegalMoves();
-                            Negamax(i1, _state, -10000, 10000, end, 0, temp);
-                            movesDepth.Add(i1, temp);
-                            i1 += 2;
-                        }
-                    }
-                    catch (TimeoutException)
-                    {
-
-                    }
-                }));
-                Thread t2 = new Thread(new ThreadStart(() =>
-                {
-                    try
-                    {
-                        while (end > DateTime.Now)
-                        {
-                            List<Move> temp = _state.GenerateAllLegalMoves();
-                            Negamax(i2, _state, -10000, 10000, end, 0, temp);
-                            movesDepth.Add(i2, temp);
-                            i2 += 2;
-                        }
-                    }
-                    catch (TimeoutException)
-                    {
-
-                    }
-                }));
-                //Thread t3 = new Thread(new ThreadStart(() =>
-                //{
-                //    try
-                //    {
-                //        while (end > DateTime.Now)
-                //        {
-                //            List<Move> temp = _state.GenerateAllLegalMoves();
-                //            Negamax(i3, _state, -10000, 10000, end, 0, temp);
-                //            movesDepth.Add(i3, temp);
-                //            i3 += 4;
-                //        }
-                //    }
-                //    catch (TimeoutException)
-                //    {
-
-                //    }
-                //}));
-                //Thread t4 = new Thread(new ThreadStart(() =>
-                //{
-                //    try
-                //    {
-                //        while (end > DateTime.Now)
-                //        {
-                //            List<Move> temp = _state.GenerateAllLegalMoves();
-                //            Negamax(i4, _state, -10000, 10000, end, 0, temp);
-                //            movesDepth.Add(i4, temp);
-                //            i4 += 4;
-                //        }
-                //    }
-                //    catch (TimeoutException)
-                //    {
-
-                //    }
-                //}));
-                t1.Start();
-                t2.Start();
-                //t3.Start();
-                //t4.Start();
-                t1.Join();
-                t2.Join();
-                //t3.Join();
-                //t4.Join();
-                //while (end > DateTime.Now)
-                //{
-                //    Negamax(i1, _state, -10000, 10000, end, 0);
-                //    movesDepth.Add(i1, _movesTop);
-                //    i1+=4;
-                //}
-
-            List<Move> highestDepth;
-            int maxDepth = movesDepth.Max(x => x.Key);
-            Console.WriteLine(maxDepth);
-            movesDepth.TryGetValue(maxDepth, out highestDepth);
-            int max = highestDepth.Max(x => x.Score);
-            var move = highestDepth.First(x => x.Score == max);
-
-            return move;
-        }
-
-
-        private int Negamax(int depth, GameState state, int alpha, int beta, DateTime end, int iteration, List<Move> possibleMoves = null)
-        {
-            if (iteration % 20 == 0 && end < DateTime.Now)
-            {
-                throw new TimeoutException();
-            }
-            if (state.Turn == Colors.NONE || depth == 0)
-            {
-                return state.StateScore();
-            }
-            List<Move> moves = possibleMoves != null ? possibleMoves : state.GenerateAllLegalMoves();
-
-            int v2 = int.MinValue;
-            for (int i = 0; i < moves.Count; i++)
-            {
-                GameState newState = new GameState(state);
-                newState.Move(moves[i]);
-                int v = -(Negamax(depth - 1, newState, -beta, -alpha, end, ++iteration));
-                moves[i].Score = v;
-                if (v >= beta)
-                {
-                    return beta + 1;
-                }
-                v2 = Math.Max(v2, v);
-                alpha = Math.Max(alpha, v);
-            }
-            return v2;
         }
     }
 }

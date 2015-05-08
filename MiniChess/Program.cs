@@ -15,7 +15,7 @@ namespace MiniChess
 {
     class Program
     {
-        public const int MAXTURNS = 40;
+        public const int MAXTURNS = 80;
         public const int MAXROW = 6;
         public const int MAXCOLUMN = 5;
         public static Random RANDOM = new Random();
@@ -24,7 +24,7 @@ namespace MiniChess
             for (int j = 0; j < 1; j++)
             {
                 var gameCenter = new GameCenter();
-                gameCenter.PlayGames(200, new AlphaBetaPlayer(7), new GreedyPlayer());
+                gameCenter.PlayGames(200, new LookaheadPlayer(3), new GreedyPlayer());
             }
 
             //dostuff();
@@ -38,14 +38,14 @@ namespace MiniChess
             //Server s = new Server("193.175.31.102", 80);
             Server server = new Server("131.252.214.11", 3589);
             GameCenter center = new GameCenter();
-            AlphaBetaTimedPlayer player = new AlphaBetaTimedPlayer(6);
-            center.PlayGameOnServer(player, server, true, startColor: Colors.WHITE);
+            AlphaBetaTimedPlayer player = new AlphaBetaTimedPlayer(7.3);
+            center.PlayGameOnServer(player, server, false,10490);
         }
         //public static void ReadAndTestFile()
         //{
         //    string[] lines = File.ReadAllLines("C:\\Users\\Stefan\\Desktop\\out.txt");
 
-        //    for(int i = 0; i< lines.Length; i++)
+        //    for (int i = 0; i < lines.Length; i++)
         //    {
         //        if (i % 1000 == 0)
         //        {
@@ -53,12 +53,12 @@ namespace MiniChess
         //        }
         //        string[] splitstrin = lines[i].Split(' ');
         //        List<string> split = splitstrin.ToList().Where(x => !string.IsNullOrEmpty(x)).ToList();
-        //        int turnCount = 39-int.Parse(split[0]);
+        //        int turnCount = 39 - int.Parse(split[0]);
         //        char turn = split[1].First();
         //        string board = split[2];
         //        var state = new GameState(turnCount, (Colors)turn, board);
-        //        AlphaBetaPlayer player = new AlphaBetaPlayer(3);
-        //        var listMoves = player.NegaMaxTest(state);
+        //        LookaheadPlayer player = new LookaheadPlayer(3);
+        //        var listMoves = player.NegaMaxParallelTest(state.GenerateAllLegalMoves(),state);
         //        int score = (int)double.Parse(split[3]);
         //        //if (state.StateScore() != score)
         //        //{
@@ -66,13 +66,13 @@ namespace MiniChess
         //        //}
         //        //var listMoves = state.GenerateAllLegalMoves();
 
-        //        if (split.Count - 3 != listMoves.Count()*2)
+        //        if (split.Count - 3 != listMoves.Count() * 2)
         //        {
         //            throw new Exception("movecount");
         //        }
-        //        for (int j = 3; j < split.Count; j+=2)
+        //        for (int j = 3; j < split.Count; j += 2)
         //        {
-        //            IEnumerable<Move> list = listMoves.Where(x => x.ToStringClean() == split[j+1]);
+        //            IEnumerable<Move> list = listMoves.Where(x => x.ToStringClean() == split[j + 1]);
         //            if (list.Count() != 1)
         //            {
         //                throw new Exception("move fehlt");

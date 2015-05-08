@@ -27,44 +27,14 @@ namespace MiniChess.Model.Players
 
         private Move StartNegamax()
         {
-            Negamax(_depth, _state, -100000, 100000);
+            _movesTop = _state.GenerateAllLegalMoves();
+            NegaMax.NegamaxRevert(_depth, _state,true, -100000, 100000, possibleMoves:_movesTop);
             int max = _movesTop.Max(x => x.Score);
             var move = _movesTop.First(x => x.Score == max);
             //randomness breaks the algorithm
             //int index = Program.RANDOM.Next(move.Count()); 
             //return move.ToList()[index];
             return move;
-        }
-
-
-        private int Negamax(int depth, GameState state, int alpha, int beta)
-        {
-            if (state.Turn == Colors.NONE || depth == 0)
-            {
-                return state.StateScore();
-            }
-            List<Move> moves = state.GenerateAllLegalMoves();
-
-            if (depth == _depth)
-            {
-                _movesTop = moves;
-            }
-
-            int v2 = int.MinValue;
-            for (int i = 0; i < moves.Count; i++)
-            {
-                GameState newState = new GameState(state);
-                newState.Move(moves[i]);
-                int v = -(Negamax(depth - 1, newState, -beta, -alpha));
-                moves[i].Score = v;
-                if (v >= beta) //Todo: Check why not working with >=
-                {
-                    return beta+1;
-                }
-                v2 = Math.Max(v2, v);
-                alpha = Math.Max(alpha, v);
-            }
-            return v2;
         }
     }
 }

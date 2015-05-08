@@ -12,7 +12,6 @@ namespace MiniChess.Model.Players
     {
         private GameState _state;
         private double _seconds;
-        private List<Move> _movesTop;
 
         public LookaheadTimedPlayer(double seconds)
         {
@@ -34,16 +33,16 @@ namespace MiniChess.Model.Players
                 DateTime end = DateTime.Now + TimeSpan.FromSeconds(_seconds);
                 while (end > DateTime.Now)
                 {
-                    _movesTop = _state.GenerateAllLegalMoves();
-                    Negamax(i, _state, end, 0);
-                    movesLastDepth = _movesTop;
+                    List<Move> temp = _state.GenerateAllLegalMoves();
+                    NegaMax.NegamaxRevert(i, _state, end: end, iteration: 0, possibleMoves: temp);
+                    movesLastDepth = temp;
                     //Console.WriteLine(i);
                     int max2 = movesLastDepth.Max(x => x.Score);
                     //Console.WriteLine(movesLastDepth.First(x => x.Score == max2));
                     i++;
                 }
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
 
             }
@@ -55,37 +54,37 @@ namespace MiniChess.Model.Players
             return list.ToList()[index];
         }
 
-        private int Negamax(int depth, GameState state, DateTime end, int iteration)
-        {
-            if (iteration % 30 == 0 && end < DateTime.Now)
-            {
-                throw new TimeoutException();
-            }
-            if (state.Turn == Colors.NONE || depth == 0)
-            {
-                return state.StateScore();
-            }
-            List<Move> moves = state.GenerateAllLegalMoves();
-            if (iteration == 0)
-            {
-                _movesTop = moves;
-            }
-            int v2 = int.MinValue;
+        //private int Negamax(int depth, GameState state, DateTime end, int iteration)
+        //{
+        //    if (iteration % 30 == 0 && end < DateTime.Now)
+        //    {
+        //        throw new TimeoutException();
+        //    }
+        //    if (state.Turn == Colors.NONE || depth == 0)
+        //    {
+        //        return state.StateScore();
+        //    }
+        //    List<Move> moves = state.GenerateAllLegalMoves();
+        //    if (iteration == 0)
+        //    {
+        //        _movesTop = moves;
+        //    }
+        //    int v2 = int.MinValue;
 
 
-            for (int i = 0; i < moves.Count; i++)
-            {
-                GameState newState = new GameState(state);
-                newState.Move(moves[i]);
-                int v = -(Negamax(depth - 1, newState, end, ++iteration));
-                moves[i].Score = v;
-                if (v > v2)
-                {
-                    v2 = v;
-                }
-            }
+        //    for (int i = 0; i < moves.Count; i++)
+        //    {
+        //        GameState newState = new GameState(state);
+        //        newState.Move(moves[i]);
+        //        int v = -(Negamax(depth - 1, newState, end, ++iteration));
+        //        moves[i].Score = v;
+        //        if (v > v2)
+        //        {
+        //            v2 = v;
+        //        }
+        //    }
 
-            return v2;
-        }
+        //    return v2;
+        //}
     }
 }

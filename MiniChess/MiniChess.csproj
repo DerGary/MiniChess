@@ -143,6 +143,7 @@
     <Compile Include="Model\Players\IPlayer.cs" />
     <Compile Include="Model\Players\LookaheadPlayer.cs" />
     <Compile Include="Model\Players\LookaheadTimedPlayer.cs" />
+    <Compile Include="Model\Players\NegaMax.cs" />
     <Compile Include="Model\Players\RandomPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
