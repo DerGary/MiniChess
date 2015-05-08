@@ -22,11 +22,15 @@ namespace MiniChess.Model.Connection
         private NetworkStream _stream;
         private StreamReader _reader;
         private StreamWriter _writer;
-        public Server(string ip, int port)
+        private string _username;
+        private string _password;
+        public Server(string ip, int port, string username, string password)
         {
             Ip = ip;
             Port = port;
             _Client = new TcpClient();
+            _username = username;
+            _password = password;
         }
         public void StartConnection()
         {
@@ -59,9 +63,9 @@ namespace MiniChess.Model.Connection
             Console.WriteLine(result);
             return result;
         }
-        public void Login(string username = "Error404NameNotFound", string password = "belinea")
+        public void Login()
         {
-            Send("me " + username + " " + password);
+            Send("me " + _username + " " + _password);
             Read();
         }
         public string OfferGame(Colors Color = Colors.NONE)

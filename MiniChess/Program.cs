@@ -36,11 +36,11 @@ namespace MiniChess
         }
         public static void dostuff()
         {
-            //Server server = new Server("193.175.31.102", 80);
-            Server server = new Server("131.252.214.11", 3589);
+            Server server = new Server("193.175.31.102", 80, "Error404NameNotFound", "gary"); //wuerzburg server
+            //Server server = new Server("131.252.214.11", 3589, "Error404NameNotFound", "belinea"); //oregon server
             GameCenter center = new GameCenter();
             AlphaBetaTimedPlayer player = new AlphaBetaTimedPlayer(7.3);
-            //center.PlayGameOnServer(player, server, false, 10599);
+            //center.PlayGameOnServer(player, server, false, 10631);
             center.PlayGameOnServer(player, server, true, startColor: Colors.WHITE); 
         }
     }
